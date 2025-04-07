@@ -1,0 +1,14 @@
+<div class="mermaid">
+sequenceDiagram
+    actor Manager
+    participant Authorization Middleware
+    participant JWT
+
+    Manager->>Authorization Middleware: Request with token
+    Authorization Middleware->>JWT: Validate token
+    JWT-->>Authorization Middleware: Token valid
+    Authorization Middleware-->>Authorization Middleware: Check permissions
+    Authorization Middleware-->>Manager: Access granted
+
+    
+</div>

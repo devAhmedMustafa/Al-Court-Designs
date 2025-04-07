@@ -1,0 +1,14 @@
+<div class="mermaid">
+sequenceDiagram
+    actor Manager
+    participant Authenticator
+    participant Decryptor
+    participant JWT
+
+    Manager->>Authenticator: Enter credentials
+    Authenticator->>Decryptor: Decrypt credentials
+    Decryptor-->>Authenticator: Return decrypted credentials
+    Authenticator->>JWT: Request for access token
+    JWT-->>Authenticator: Return access token
+    Authenticator-->>Manager: Return access token
+</div>
