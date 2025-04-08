@@ -42,6 +42,11 @@ classDiagram
         + findManagerByID(id: string): Manager
     }
 
+    class Authorization {
+        + validateToken(token: JWTToken): boolean
+        + checkPermissions(role: Role): boolean
+    }
+
     JWTToken <|-- Token
     AuthService o-- ManagerDAO
     AuthService o-- Credentials
@@ -49,5 +54,8 @@ classDiagram
     AuthService o-- PasswordEncryptor
     ManagerDAO o-- Manager
     Manager o-- Role
+
+    Authorization o-- JWTToken
+    Authorization o-- Role
 
 </div>
