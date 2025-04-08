@@ -1,0 +1,29 @@
+<div class="mermaid">
+sequenceDiagram
+
+    title: Authentication Process
+
+    actor ManagerClient
+    participant AuthController
+    participant AuthValidator
+    participant AuthService
+    participant ManagerDAO
+    participant Manager
+    participant PasswordEncryptor
+    participant JWT
+
+    ManagerClient->>AuthController: Login(credintialsRequest)
+    AuthController->>AuthValidator: Validate(credintialsRequest)
+    AuthValidator-->>AuthController: Credentials valid
+    AuthController->>AuthService: Authenticate(credintialsRequest)
+    AuthService->>ManagerDAO: FindManagerByID(credintials.userID)
+    ManagerDAO->>Manager: Create manager object
+    ManagerDAO-->>AuthService: Return manager
+    AuthService->>PasswordEncryptor: Compare(credintials.password, manager.password)
+    PasswordEncryptor-->>AuthService: Password match
+    AuthService->>JWT: AssignToken(userID, role)
+    JWT-->>AuthService: Return access token
+    AuthService-->>AuthController: Return access token
+    AuthController-->>ManagerClient: Return access token
+    
+</div>

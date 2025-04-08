@@ -1,0 +1,53 @@
+<div class="mermaid">
+
+classDiagram
+
+    class Credentials {
+        + userID: string
+        + password: string
+    }
+
+    class Role {
+        <<enumeration>>
+        OWNER
+        SUBMANAGER
+    }
+
+    class Manager {
+        + id: string
+        + password: string
+        + role: string
+    }
+
+    class Token {
+        + token: string
+        + expiration: Date
+    }
+
+    class JWTToken {
+        + refreshToken: string
+    }
+
+    class PasswordEncryptor {
+        + encrypt(password: string): string
+        + compare(password: string, encryptedPassword: string): boolean
+    }
+
+    class AuthService {
+        + authenticate(credentials: Credentials): Token
+    }
+
+    class ManagerDAO {
+        + addManager(manager: Manager): void
+        + findManagerByID(id: string): Manager
+    }
+
+    JWTToken <|-- Token
+    AuthService o-- ManagerDAO
+    AuthService o-- Credentials
+    AuthService o-- JWTToken
+    AuthService o-- PasswordEncryptor
+    ManagerDAO o-- Manager
+    Manager o-- Role
+
+</div>
