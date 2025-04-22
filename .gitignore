@@ -1,0 +1,11 @@
+/OrdrMate.sln
+
+.idea
+.vscode
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+*.sln.ide
+*.sln.docstates
