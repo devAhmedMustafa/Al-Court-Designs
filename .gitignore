@@ -9,3 +9,5 @@ obj/
 *.userprefs
 *.sln.ide
 *.sln.docstates
+
+.env
