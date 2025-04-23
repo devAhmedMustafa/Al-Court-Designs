@@ -8,4 +8,13 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
 {
     public DbSet<Manager> Manager => Set<Manager>();
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Manager>()
+        .HasIndex(m=> m.Username).IsUnique();
+    }
+
+
 }

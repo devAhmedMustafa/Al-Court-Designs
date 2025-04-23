@@ -5,15 +5,19 @@ using OrdrMate.Models;
 namespace OrdrMate.Repositories;
 
 public class ManagerRepo(OrdrMateDbContext c) : IManagerRepo {
-    private readonly OrdrMateDbContext _context = c;
+    private readonly OrdrMateDbContext _db = c;
 
     public async Task<IEnumerable<Manager>> GetAll(){
-        return await _context.Manager.ToListAsync();
+        return await _db.Manager.ToListAsync();
     }
 
     public async Task<Manager> CreateManager(Manager manager){
-        _context.Manager.Add(manager);
-        await _context.SaveChangesAsync();
+        _db.Manager.Add(manager);
+        await _db.SaveChangesAsync();
         return manager;
+    }
+
+    public async Task<Manager?> GetManagerByUsername(string username){
+        return await _db.Manager.FirstOrDefaultAsync(m => m.Username == username);
     }
 }

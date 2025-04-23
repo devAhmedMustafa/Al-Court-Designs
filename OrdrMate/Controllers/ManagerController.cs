@@ -17,14 +17,32 @@ public class ManagerController(ManagerService s) : ControllerBase {
     }
 
     [HttpPost]
-    public async Task<ActionResult> Signup([FromBody] CreateManagerDTO data){
+    public async Task<ActionResult<ManagerDTO>> RegisterManager([FromBody] CreateManagerDTO data){
 
-        if (!ModelState.IsValid){
-            return BadRequest(ModelState);
+        try {
+            var result = await _service.CreateManager(data);
+            return CreatedAtAction(nameof(RegisterManager), new {id=result.Id}, result);
         }
+        catch(Exception ex){
+            if (ex.Message.Contains("already exists"))
+                return Conflict(new {err=ex.Message});
 
-        var createdManager = await _service.CreateManager(data);
-        return Ok(createdManager);
+            return BadRequest(new {err=ex.Message});
+        }
+    }
+
+    [HttpPost("login")]
+    public async Task<ActionResult> LoginManager([FromBody] LoginDTO data){
+        try {
+            var result = await _service.AuthenticateManager(data);
+            return Ok(new {token=result});
+        }
+        catch(Exception ex){
+            if (ex.Message.Contains("credentials"))
+                return Unauthorized(new {err=ex.Message});
+            
+            return BadRequest(new {err=ex.Message});
+        }
     }
 
 }
