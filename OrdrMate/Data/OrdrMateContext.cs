@@ -3,8 +3,9 @@ using OrdrMate.Models;
 
 namespace OrdrMate.Data;
 
-public class OrdrMateContext(DbContextOptions<OrdrMateContext> options) 
+public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options) 
     : DbContext (options)
 {
-    DbSet<Manager> Managers => Set<Manager>();
+    public DbSet<Manager> Manager => Set<Manager>();
+
 }

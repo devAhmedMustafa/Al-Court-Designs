@@ -1,7 +1,10 @@
+using System.Numerics;
 using DotNetEnv;
 
 using Microsoft.EntityFrameworkCore;
 using OrdrMate.Data;
+using OrdrMate.Repositories;
+using OrdrMate.Services;
 
 Env.Load();
 
@@ -13,7 +16,14 @@ builder.Services.AddSwaggerGen();
 
 var connectionString = Environment.GetEnvironmentVariable("DB_URL");
 
-builder.Services.AddDbContext<OrdrMateContext>(options => options.UseNpgsql(connectionString));
+Console.WriteLine(connectionString);
+
+builder.Services.AddDbContext<OrdrMateDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IManagerRepo, ManagerRepo>();
+builder.Services.AddScoped<ManagerService, ManagerService>();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -25,6 +35,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.MapControllers();
 app.Run();
 
