@@ -1,0 +1,34 @@
+<div class="mermaid">
+erDiagram
+    
+    Manager
+
+    Restaurant {
+        id uuid PK
+        name varchar 
+        phone varchar
+        email varchar
+    }
+
+    Branch {
+        id uuid PK
+        location varchar
+    }
+
+    Item {
+        id uuid PK
+        name varchar
+        category varchar
+        image varchar
+        price float
+        sizesAvailable SIZE
+        customizations JSON
+        preperationTime float
+    }
+
+    Restaurant ||--|{ Branch : has
+    Restaurant ||--o{ Item : includes
+    Manager ||--o| Restaurant : manages
+    Manager ||--o| Branch : manages
+
+</div>

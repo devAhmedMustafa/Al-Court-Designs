@@ -38,7 +38,7 @@ public class ManagerController(ManagerService s) : ControllerBase {
             return Ok(new {token=result});
         }
         catch(Exception ex){
-            if (ex.Message.Contains("credentials"))
+            if (ex.Message.Contains("Credentials"))
                 return Unauthorized(new {err=ex.Message});
             
             return BadRequest(new {err=ex.Message});

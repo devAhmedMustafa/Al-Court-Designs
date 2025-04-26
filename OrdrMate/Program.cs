@@ -24,6 +24,17 @@ Console.WriteLine(connectionString);
 builder.Services.AddDbContext<OrdrMateDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddScoped<IManagerRepo, ManagerRepo>();
 builder.Services.AddScoped<ManagerService, ManagerService>();
 builder.Services.AddControllers();
@@ -49,6 +60,7 @@ builder.Services.AddAuthorization();
 
 
 var app = builder.Build();
+app.UseCors("AllowSpecificOrigin");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

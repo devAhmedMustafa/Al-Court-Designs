@@ -1,0 +1,82 @@
+<div class="mermaid">
+classDiagram
+
+    class Restaurant {
+        + id : string
+        + name : string
+        + phone : string
+        + email : string
+    }
+
+    class Branch {
+        + id : string
+        + location : string
+    }
+
+    class Size {
+        <<enumeration>>
+        + XS
+        + S
+        + M
+        + L
+        + XL
+    }
+
+    class Item {
+        + id : string
+        + name : string
+        + category : string
+        + image : string
+        + price : float
+        + sizesAvailable : Size[]
+        + customizations : JSON
+        + preperationTime : float
+    }
+
+    class ItemDTO {
+        + id : string
+        + name : string
+        + category : string
+        + image : string
+        + price : float
+        + sizesAvailable : Size[]
+        + customizations : JSON
+        + preperationTime : float
+    }
+
+    class AddItemDTO {
+        + name : string
+        + category : string
+        + image : string
+        + price : float
+        + sizesAvailable : Size[]
+        + customizations : JSON
+        + preperationTime : float
+    }
+
+    class RestaurantRepo {
+        + CreateRestaurant(restaurant: Restaurant)
+        + GetRestaurantById(id: string)
+        + GetRestaurantByManager(managerId: string)
+    }
+
+    class ItemRepo {
+        + CreateItem(item: Item) Item
+        + GetAllItems() Item[]
+    }
+
+    class ItemService {
+        + AddItem(dto: AddItemDTO) ItemDTO
+    }
+
+    Manager "1" --o "1" Restaurant : has
+    Restaurant "1" *-- "*" Branch : has
+    Manager "1" --o "1" Branch : has
+    Item "*" --* "1" Restaurant
+    Restaurant -- RestaurantRepo
+    Item -- ItemRepo
+    ItemDTO -- ItemService
+    AddItemDTO -- ItemService
+    ItemRepo --o "1" ItemService
+
+</div>
