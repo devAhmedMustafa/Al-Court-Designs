@@ -7,6 +7,7 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
     : DbContext (options)
 {
     public DbSet<Manager> Manager => Set<Manager>();
+    public DbSet<Restaurant> Restaurant => Set<Restaurant>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -14,6 +15,10 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
 
         modelBuilder.Entity<Manager>()
         .HasIndex(m=> m.Username).IsUnique();
+
+        modelBuilder.Entity<Restaurant>()
+        .HasIndex(r => r.Name).IsUnique();
+
     }
 
 
