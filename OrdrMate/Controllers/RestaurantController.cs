@@ -10,7 +10,7 @@ public class RestaurantController(RestaurantService r) : ControllerBase {
     private readonly RestaurantService _service = r;
 
     [HttpPost]
-    public async Task<ActionResult<RestaurantController>> CreateRestaurant([FromBody] CreateRestaurantDTO dto){
+    public async Task<ActionResult<RestaurantController>> CreateRestaurant([FromBody] CreateRestaurantDto dto){
         try {
             var result = await _service.CreateRestaurant(dto);
             return CreatedAtAction(nameof(CreateRestaurant), new{id=result.Id}, result);

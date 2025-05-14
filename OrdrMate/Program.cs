@@ -37,6 +37,10 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddScoped<IManagerRepo, ManagerRepo>();
 builder.Services.AddScoped<ManagerService, ManagerService>();
+
+builder.Services.AddScoped<IRestaurantRepo, RestaurantRepo>();
+builder.Services.AddScoped<RestaurantService, RestaurantService>();
+
 builder.Services.AddControllers();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

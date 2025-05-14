@@ -1,4 +1,3 @@
-<div class="mermaid">
 erDiagram
     
     Manager
@@ -18,17 +17,20 @@ erDiagram
     Item {
         id uuid PK
         name varchar
-        category varchar
         image varchar
         price float
         sizesAvailable SIZE
         customizations JSON
         preperationTime float
     }
+    
+    Category {
+        name varchar PK
+    }
 
     Restaurant ||--|{ Branch : has
     Restaurant ||--o{ Item : includes
     Manager ||--o| Restaurant : manages
     Manager ||--o| Branch : manages
-
-</div>
+    Item ||--o| Category : "belongs to"
+    Restaurant ||--o| Category : "has"

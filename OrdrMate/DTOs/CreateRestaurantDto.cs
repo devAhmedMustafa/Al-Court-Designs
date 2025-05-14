@@ -2,9 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OrdrMate.DTOs;
 
-public class CreateRestaurantDTO {
+public class CreateRestaurantDto {
     [Required] public string Name {get; set;}
     public string Phone{get; set;}
     public string Email{get; set;}
-    public string ManagerUsername{get; set;}
+    [Required] public string ManagerUsername{get; set;}
 }

@@ -8,7 +8,7 @@ public class RestaurantService(IRestaurantRepo r, IManagerRepo m) {
     private readonly IRestaurantRepo _repo = r;
     private readonly IManagerRepo _managerRepo = m;
 
-    public async Task<RestaurantDTO> CreateRestaurant(CreateRestaurantDTO dto){
+    public async Task<RestaurantDTO> CreateRestaurant(CreateRestaurantDto dto){
         try {
 
             var manager = await _managerRepo.GetManagerByUsername(dto.ManagerUsername);

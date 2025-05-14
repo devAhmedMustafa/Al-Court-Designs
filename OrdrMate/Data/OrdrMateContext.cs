@@ -8,6 +8,8 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
 {
     public DbSet<Manager> Manager => Set<Manager>();
     public DbSet<Restaurant> Restaurant => Set<Restaurant>();
+    public DbSet<Item> Item => Set<Item>();
+    public DbSet<Category> Category => Set<Category>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -18,6 +20,12 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
 
         modelBuilder.Entity<Restaurant>()
         .HasIndex(r => r.Name).IsUnique();
+        
+        // Make sure that the name and restaurantid of the category are combined unique
+        modelBuilder.Entity<Category>()
+            .HasIndex(c => new { c.Name, c.RestaurantId }).IsUnique();
+
+        modelBuilder.Entity<Category>().HasNoKey();
 
     }
 
