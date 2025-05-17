@@ -1,11 +1,12 @@
-using System.Numerics;
 using System.Text;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using OrdrMate.Data;
+using OrdrMate.DTOs;
+using OrdrMate.Middlewares;
 using OrdrMate.Repositories;
 using OrdrMate.Services;
 
@@ -18,8 +19,6 @@ builder.Services.AddSwaggerGen();
 
 
 var connectionString = Environment.GetEnvironmentVariable("DB_URL");
-
-Console.WriteLine(connectionString);
 
 builder.Services.AddDbContext<OrdrMateDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -35,13 +34,20 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Repositories and Services
+
 builder.Services.AddScoped<IManagerRepo, ManagerRepo>();
 builder.Services.AddScoped<ManagerService, ManagerService>();
 
 builder.Services.AddScoped<IRestaurantRepo, RestaurantRepo>();
 builder.Services.AddScoped<RestaurantService, RestaurantService>();
 
+builder.Services.AddScoped<IItemRepo, ItemRepo>();
+builder.Services.AddScoped<ItemService, ItemService>();
+
 builder.Services.AddControllers();
+
+// JWT Authentication
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -60,7 +66,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddAuthorization();
+// Authorization
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("CanManageRestaurant", policy =>
+        policy.Requirements.Add(new ManageRestaurantRequirement()));
+});
+
+// Authorization Handlers
+builder.Services.AddScoped<IAuthorizationHandler, ManageRestaurantHandler>();
 
 
 var app = builder.Build();
