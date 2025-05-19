@@ -2,6 +2,7 @@ namespace OrdrMate.Middlewares;
 
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using OrdrMate.Models;
 using OrdrMate.Repositories;
 
 public class ManageRestaurantHandler : AuthorizationHandler<ManageRestaurantRequirement, string>
@@ -18,7 +19,14 @@ public class ManageRestaurantHandler : AuthorizationHandler<ManageRestaurantRequ
         string restaurantId
         )
     {
-        var managerId = context.User.FindFirst(ClaimTypes.Name)?.Value;
+        var managerId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        // Check manager role
+        if (!context.User.IsInRole(ManagerRole.TopManager.ToString()))
+        {
+            context.Fail();
+            return;
+        }
 
         if (string.IsNullOrEmpty(managerId) || string.IsNullOrEmpty(restaurantId))
         {

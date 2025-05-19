@@ -4,12 +4,14 @@ using OrdrMate.DTOs;
 
 namespace OrdrMate.Controllers;
 
+[ApiController]
+[Route("/api/[controller]")]
 public class ItemController : ControllerBase
 {
     private readonly ItemService _service;
     private readonly IAuthorizationService _authorizationService;
 
-    private ItemController(ItemService service, IAuthorizationService authorizationService)
+    public ItemController(ItemService service, IAuthorizationService authorizationService)
     {
         _service = service;
         _authorizationService = authorizationService;
@@ -24,7 +26,7 @@ public class ItemController : ControllerBase
 
             if (!authorizationResult.Succeeded)
             {
-                return Forbid();
+                return Forbid("You do not have permission to manage this restaurant.");
             }
 
             var result = await _service.AddItem(dto);

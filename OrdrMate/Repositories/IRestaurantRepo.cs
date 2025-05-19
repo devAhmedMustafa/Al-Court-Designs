@@ -6,5 +6,7 @@ public interface IRestaurantRepo
 {
     Task<Restaurant> CreateRestaurant(Restaurant restaurant);
     Task<Restaurant?> GetRestaurantById(string id);
-    Task<Boolean> HasAccessToRestaurant(string managerId, string restaurantId);
+    Task<bool> HasAccessToRestaurant(string managerId, string restaurantId);
+
+    Task<Restaurant?> GetRestaurantByManagerId(string managerId);
 }

@@ -10,8 +10,14 @@ public class ManagerRepo(OrdrMateDbContext c) : IManagerRepo {
     public async Task<IEnumerable<Manager>> GetAll(){
         return await _db.Manager.ToListAsync();
     }
+    
+    public async Task<Manager?> GetManagerById(string id)
+    {
+        return await _db.Manager.FirstOrDefaultAsync(m => m.Id == id);
+    }
 
-    public async Task<Manager> CreateManager(Manager manager){
+    public async Task<Manager> CreateManager(Manager manager)
+    {
         _db.Manager.Add(manager);
         await _db.SaveChangesAsync();
         return manager;

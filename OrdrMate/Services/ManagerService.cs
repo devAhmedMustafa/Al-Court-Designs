@@ -6,8 +6,9 @@ using OrdrMate.Repositories;
 
 namespace OrdrMate.Services;
 
-public class ManagerService(IManagerRepo r, IConfiguration c) {
+public class ManagerService(IManagerRepo r, IRestaurantRepo rr, IConfiguration c) {
     private readonly IManagerRepo _repo = r;
+    private readonly IRestaurantRepo _restaurantRepo = rr;
     private readonly IConfiguration _config = c;
 
     public async Task<IEnumerable<ManagerDTO>> GetAllManagers(){
@@ -44,7 +45,8 @@ public class ManagerService(IManagerRepo r, IConfiguration c) {
         }
     }
 
-    public async Task<string> AuthenticateManager(LoginDTO data) {
+    public async Task<LoginSuccessDto> AuthenticateManager(LoginDTO data) {
+
         var manager = await _repo.GetManagerByUsername(data.Username)
             ?? throw new Exception("Invalid Credentials");
 
@@ -53,6 +55,22 @@ public class ManagerService(IManagerRepo r, IConfiguration c) {
 
         var jwtService = new JWTService(_config);
 
-        return jwtService.GenerateJWT(data.Username);
+        var restaurantId = "";
+
+        if (manager.Role == ManagerRole.TopManager)
+        {
+            var restaurant = await _restaurantRepo.GetRestaurantByManagerId(manager.Id);
+            if (restaurant != null)
+            {
+                restaurantId = restaurant.Id;
+            }
+        }
+
+        return new LoginSuccessDto
+        {
+            Token = jwtService.GenerateJWT(manager.Id, manager.Role),
+            Role = manager.Role.ToString(),
+            RestaurantId = restaurantId,
+        };
     }
 }

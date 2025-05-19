@@ -32,10 +32,10 @@ public class ManagerController(ManagerService s) : ControllerBase {
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult> LoginManager([FromBody] LoginDTO data){
+    public async Task<ActionResult<LoginSuccessDto>> LoginManager([FromBody] LoginDTO data){
         try {
             var result = await _service.AuthenticateManager(data);
-            return Ok(new {token=result});
+            return Ok(result);
         }
         catch(Exception ex){
             if (ex.Message.Contains("Credentials"))
