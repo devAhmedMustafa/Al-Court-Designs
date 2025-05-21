@@ -10,4 +10,6 @@ obj/
 *.sln.ide
 *.sln.docstates
 
+/uploads
+
 .env
