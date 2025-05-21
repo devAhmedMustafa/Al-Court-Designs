@@ -52,4 +52,23 @@ public class RestaurantController(RestaurantService r) : ControllerBase
             return BadRequest(new { err = e.Message });
         }
     }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<RestaurantDTO>> GetRestaurantById(string id)
+    {
+        try
+        {
+            var restaurant = await _service.GetRestaurantById(id);
+            if (restaurant == null)
+            {
+                return NotFound(new { err = "No restaurant found with this ID" });
+            }
+
+            return Ok(restaurant);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new { err = e.Message });
+        }
+    }
 }

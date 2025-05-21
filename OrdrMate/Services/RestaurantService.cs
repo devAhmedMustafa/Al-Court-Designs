@@ -78,4 +78,32 @@ public class RestaurantService(IRestaurantRepo r, IManagerRepo m)
         }
     }
 
+    public async Task<RestaurantDTO> GetRestaurantById(string id)
+    {
+        try
+        {
+            var restaurant = await _repo.GetRestaurantById(id);
+
+            if (restaurant == null)
+            {
+                throw new Exception("No restaurant with " + id + " id");
+            }
+
+            var responseDto = new RestaurantDTO
+            {
+                Id = restaurant.Id,
+                Name = restaurant.Name,
+            };
+
+            if (restaurant.Email != null) responseDto.Email = restaurant.Email;
+            if (restaurant.Phone != null) responseDto.Phone = restaurant.Phone;
+
+            return responseDto;
+        }
+        catch (Exception e)
+        {
+            throw new Exception($"Error getting restaurant: {e.Message}");
+        }
+    }
+
 }

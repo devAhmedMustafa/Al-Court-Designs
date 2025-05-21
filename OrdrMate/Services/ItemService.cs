@@ -30,28 +30,115 @@ public class ItemService(IItemRepo itemRepo)
             }
 
             return new ItemDto
-                {
-                    Id = addedItem.Id,
-                    Name = addedItem.Name,
-                    Description = addedItem.Description,
-                    ImageUrl = addedItem.ImageUrl,
-                    Price = addedItem.Price,
-                    Category = addedItem.CategoryName
-                };
-            
-        } catch (Exception ex)
+            {
+                Id = addedItem.Id,
+                Name = addedItem.Name,
+                Description = addedItem.Description,
+                ImageUrl = addedItem.ImageUrl,
+                Price = addedItem.Price,
+                Category = addedItem.CategoryName
+            };
+
+        }
+        catch (Exception ex)
         {
             throw new Exception($"Error adding item: {ex.Message}");
         }
     }
 
-    public async Task<Item?> GetItem(string id)
+    public async Task<ItemDto?> GetItem(string id)
     {
-        return await _itemRepo.GetItem(id);
+        var item = await _itemRepo.GetItem(id);
+
+        if (item == null)
+        {
+            throw new Exception("Item not found");
+        }
+
+        return new ItemDto
+        {
+            Id = item.Id,
+            Name = item.Name,
+            Description = item.Description,
+            ImageUrl = item.ImageUrl,
+            Price = item.Price,
+            Category = item.CategoryName
+        };
     }
 
     public async Task<IEnumerable<Item>> GetItems()
     {
         return await _itemRepo.GetItems();
+    }
+
+    public async Task<IEnumerable<ItemDto>> GetItemsByRestaurantId(string restaurantId)
+    {
+        var items = await _itemRepo.GetItemsByRestaurantId(restaurantId);
+
+        if (items == null || !items.Any())
+        {
+            throw new Exception("No items found for this restaurant");
+        }
+
+        return items.Select(item => new ItemDto
+        {
+            Id = item.Id,
+            Name = item.Name,
+            Description = item.Description,
+            ImageUrl = item.ImageUrl,
+            Price = item.Price,
+            Category = item.CategoryName
+        });
+    }
+
+    public async Task<ItemDto?> UpdateItem(string id, UpdateItemDto updatedItem)
+    {
+        Item item = new()
+        {
+            Name = updatedItem.Name,
+            Description = updatedItem.Description,
+            ImageUrl = updatedItem.ImageUrl,
+            Price = updatedItem.Price,
+            CategoryName = updatedItem.Category
+        };
+
+        var updated = await _itemRepo.UpdateItem(id, item);
+
+        if (updated == null)
+        {
+            throw new Exception("Failed to update item");
+        }
+
+        return new ItemDto
+        {
+            Id = updated.Id,
+            Name = updated.Name,
+            Description = updated.Description,
+            ImageUrl = updated.ImageUrl,
+            Price = updated.Price,
+            Category = updated.CategoryName
+        };
+
+    }
+
+    public async Task<bool> DeleteItem(string id)
+    {
+        return await _itemRepo.DeleteItem(id);
+    }
+
+    public async Task<ItemAuthInfo> GetItemAuthInfo(string id)
+    {
+        var item = await _itemRepo.GetItem(id);
+
+        if (item == null)
+        {
+            throw new Exception("Item not found");
+        }
+
+        return new ItemAuthInfo
+        {
+            Id = item.Id,
+            RestaurantId = item.RestaurantId,
+        };
     }
 }

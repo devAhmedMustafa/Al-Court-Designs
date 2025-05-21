@@ -40,4 +40,102 @@ public class ItemController : ControllerBase
             return BadRequest(new { err = e.Message });
         }
     }
+
+    [HttpGet("restaurant/{restaurantId}")]
+    public async Task<ActionResult<IEnumerable<ItemDto>>> GetItemsByRestaurantId(string restaurantId)
+    {
+        try
+        {
+            var items = await _service.GetItemsByRestaurantId(restaurantId);
+            return Ok(items);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new { err = e.Message });
+        }
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ItemDto>> GetItem(string id)
+    {
+        try
+        {
+            var item = await _service.GetItem(id);
+            if (item == null)
+            {
+                return NotFound(new { err = "Item not found" });
+            }
+            return Ok(item);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new { err = e.Message });
+        }
+    }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult<ItemDto>> UpdateItem(string id, [FromBody] UpdateItemDto dto)
+    {
+        try
+        {
+
+            var itemToUpdate = await _service.GetItemAuthInfo(id);
+
+            if (itemToUpdate == null)
+            {
+                return NotFound(new { err = "Item not found" });
+            }
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, itemToUpdate.RestaurantId, "CanManageRestaurant");
+
+            if (!authorizationResult.Succeeded)
+            {
+                return Forbid("You do not have permission to manage this restaurant.");
+            }
+
+            var item = await _service.UpdateItem(id, dto);
+            if (item == null)
+            {
+                return NotFound(new { err = "Item not found" });
+            }
+            return Ok(item);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new { err = e.Message });
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteItem(string id)
+    {
+        try
+        {
+            var itemToDelete = await _service.GetItemAuthInfo(id);
+
+            if (itemToDelete == null)
+            {
+                return NotFound(new { err = "Item not found" });
+            }
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, itemToDelete.RestaurantId, "CanManageRestaurant");
+
+            if (!authorizationResult.Succeeded)
+            {
+                return Forbid("You do not have permission to manage this restaurant.");
+            }
+
+            var result = await _service.DeleteItem(id);
+            if (!result)
+            {
+                return NotFound(new { err = "Item not found" });
+            }
+            return NoContent();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new { err = e.Message });
+        }
+    }
+
 }

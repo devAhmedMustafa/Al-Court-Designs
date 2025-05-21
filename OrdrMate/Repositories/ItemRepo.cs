@@ -50,7 +50,7 @@ public class ItemRepo(OrdrMateDbContext context) : IItemRepo
             Console.WriteLine("----------------------------------------");
 
         }
-        
+
         await _context.Item.AddAsync(item);
         await _context.SaveChangesAsync();
         return item;
@@ -65,4 +65,44 @@ public class ItemRepo(OrdrMateDbContext context) : IItemRepo
     {
         return await _context.Item.ToListAsync();
     }
+
+    public async Task<IEnumerable<Item>> GetItemsByRestaurantId(string restaurantId)
+    {
+        return await _context.Item
+            .Where(i => i.RestaurantId == restaurantId)
+            .ToListAsync();
+    }
+
+    public async Task<Item?> UpdateItem(string id, Item item)
+    {
+        var existingItem = await _context.Item.FindAsync(id);
+        if (existingItem == null)
+        {
+            return null;
+        }
+
+        existingItem.Name = item.Name;
+        existingItem.Description = item.Description;
+        existingItem.ImageUrl = item.ImageUrl;
+        existingItem.Price = item.Price;
+        existingItem.PreperationTime = item.PreperationTime;
+
+        await _context.SaveChangesAsync();
+        return existingItem;
+    }
+
+    public async Task<bool> DeleteItem(string id)
+    {
+        var item = await _context.Item.FindAsync(id);
+        if (item == null)
+        {
+            return false;
+        }
+
+        _context.Item.Remove(item);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+    
+
 }
