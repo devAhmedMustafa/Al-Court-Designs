@@ -10,6 +10,10 @@ obj/
 *.sln.ide
 *.sln.docstates
 
-/uploads
+# static files
+uploads
+*.png
+*.jpg
+*.jpeg
 
 .env

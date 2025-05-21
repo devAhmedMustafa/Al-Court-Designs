@@ -1,6 +1,6 @@
 namespace OrdrMate.Models;
 
-public class Branch
+public class BranchRequest
 {
     public string Id { get; set; }
     public float Lantitude { get; set; }
@@ -8,8 +8,5 @@ public class Branch
     public string Address { get; set; }
     public string Phone { get; set; }
     public string RestaurantId { get; set; }
-    public string BranchManagerId { get; set; }
-    public Manager BranchManager { get; set; }
     public Restaurant Restaurant { get; set; }
-    
 }

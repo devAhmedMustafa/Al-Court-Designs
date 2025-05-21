@@ -4,4 +4,5 @@ public enum ManagerRole
 {
     TopManager,
     BranchManager,
+    Admin,
 }

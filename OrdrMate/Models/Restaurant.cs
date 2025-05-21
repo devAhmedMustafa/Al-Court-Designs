@@ -9,5 +9,6 @@ public class Restaurant
     public required string ManagerId { get; set; }
     public Manager Manager { get; set; }
     public List<Category> Categories { get; set; } = [];
+    public List<Branch> Branches { get; set; } = [];
     public List<Item> Items { get; set; } = [];
 }

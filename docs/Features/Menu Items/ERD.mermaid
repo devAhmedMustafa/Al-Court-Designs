@@ -1,6 +1,9 @@
 erDiagram
     
-    Manager
+    Manager{
+        id uuid PK
+        role int
+    }
 
     Restaurant {
         id uuid PK
@@ -11,21 +14,23 @@ erDiagram
 
     Branch {
         id uuid PK
-        location varchar
+        latitude float
+        longitude float
     }
 
     Item {
         id uuid PK
-        name varchar
+        name varchar UK
         image varchar
         price float
-        sizesAvailable SIZE
+        sizesAvailable varchar(255)
         customizations JSON
         preperationTime float
     }
     
     Category {
-        name varchar PK
+        name varchar
+        restaurantId uuid FK
     }
 
     Restaurant ||--|{ Branch : has

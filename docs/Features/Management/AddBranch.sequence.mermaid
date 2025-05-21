@@ -1,0 +1,34 @@
+sequenceDiagram
+    actor ManagerClient
+    participant RequestBranchEndpoint
+    participant CanManageRestaurantAuth
+    participant BranchRequestRepository
+    actor AdminClient
+    participant AdminAuthorization
+    participant BranchService
+    participant BranchRepository
+
+    ManagerClient->>+RequestBranchEndpoint: POST /request-branch
+    RequestBranchEndpoint->>+CanManageRestaurantAuth: Check if user can manage restaurant
+    CanManageRestaurantAuth-->>-RequestBranchEndpoint: User can manage restaurant
+    RequestBranchEndpoint->>+BranchRequestRepository: Create branch request
+    BranchRequestRepository-->>-RequestBranchEndpoint: Branch request created
+    RequestBranchEndpoint-->>-ManagerClient: Branch request created
+    AdminClient->>+RequestBranchEndpoint: GET /requests
+    RequestBranchEndpoint->>+AdminAuthorization: Check if user is admin
+    AdminAuthorization-->>-RequestBranchEndpoint: User is admin
+    RequestBranchEndpoint->>+BranchRequestRepository: Get all branch requests
+    BranchRequestRepository-->>-RequestBranchEndpoint: All branch requests
+    RequestBranchEndpoint-->>-AdminClient: All branch requests
+    AdminClient->>+RequestBranchEndpoint: POST /approve-request
+    RequestBranchEndpoint->>+AdminAuthorization: Check if user is admin
+    AdminAuthorization-->>-RequestBranchEndpoint: User is admin
+    RequestBranchEndpoint->>+BranchRequestRepository: Get branch request
+    BranchRequestRepository-->>-RequestBranchEndpoint: Branch request
+    RequestBranchEndpoint->>+BranchService: Create branch
+    BranchService->>+BranchRepository: Create branch
+    BranchRepository-->>-BranchService: Branch created
+    BranchService-->>-RequestBranchEndpoint: Branch created
+    RequestBranchEndpoint->>+BranchRequestRepository: Delete branch request
+    BranchRequestRepository-->>-RequestBranchEndpoint: Branch request deleted
+    RequestBranchEndpoint-->>-AdminClient: Branch request approved

@@ -10,6 +10,8 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
     public DbSet<Restaurant> Restaurant => Set<Restaurant>();
     public DbSet<Item> Item => Set<Item>();
     public DbSet<Category> Category => Set<Category>();
+    public DbSet<Branch> Branch => Set<Branch>();
+    public DbSet<BranchRequest> BranchRequest => Set<BranchRequest>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -53,6 +55,33 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
             .HasOne(i => i.Restaurant)
             .WithMany(r => r.Items)
             .HasForeignKey(i => i.RestaurantId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Branch
+        
+        modelBuilder.Entity<Branch>().HasKey(b => b.Id);
+        modelBuilder.Entity<Branch>().HasIndex(b => b.Phone).IsUnique();
+        modelBuilder.Entity<Branch>().HasIndex(b => new { b.Lantitude, b.Longitude, b.RestaurantId }).IsUnique();
+        modelBuilder.Entity<Branch>()
+            .HasOne(b => b.Restaurant)
+            .WithMany(r => r.Branches)
+            .HasForeignKey(b => b.RestaurantId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Branch>()
+            .HasOne(b => b.BranchManager)
+            .WithMany()
+            .HasForeignKey(b => b.BranchManagerId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // BranchRequest
+
+        modelBuilder.Entity<BranchRequest>().HasKey(br => br.Id);
+        modelBuilder.Entity<BranchRequest>().HasIndex(br => new { br.Lantitude, br.Longitude, br.RestaurantId }).IsUnique();
+        modelBuilder.Entity<BranchRequest>()
+            .HasOne(br => br.Restaurant)
+            .WithMany()
+            .HasForeignKey(br => br.RestaurantId)
             .OnDelete(DeleteBehavior.Cascade);
 
     }
