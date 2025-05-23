@@ -71,4 +71,18 @@ public class RestaurantController(RestaurantService r) : ControllerBase
             return BadRequest(new { err = e.Message });
         }
     }
+
+    [HttpGet("list/all")]
+    public async Task<ActionResult<List<RestaurantDTO>>> GetAllRestaurants()
+    {
+        try
+        {
+            var restaurants = await _service.GetAllRestaurants();
+            return Ok(restaurants);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new { err = e.Message });
+        }
+    }
 }

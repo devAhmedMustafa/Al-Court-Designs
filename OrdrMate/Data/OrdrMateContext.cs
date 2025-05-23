@@ -12,6 +12,7 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
     public DbSet<Category> Category => Set<Category>();
     public DbSet<Branch> Branch => Set<Branch>();
     public DbSet<BranchRequest> BranchRequest => Set<BranchRequest>();
+    public DbSet<Table> Table => Set<Table>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -58,7 +59,7 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Branch
-        
+
         modelBuilder.Entity<Branch>().HasKey(b => b.Id);
         modelBuilder.Entity<Branch>().HasIndex(b => b.Phone).IsUnique();
         modelBuilder.Entity<Branch>().HasIndex(b => new { b.Lantitude, b.Longitude, b.RestaurantId }).IsUnique();
@@ -80,8 +81,19 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
         modelBuilder.Entity<BranchRequest>().HasIndex(br => new { br.Lantitude, br.Longitude, br.RestaurantId }).IsUnique();
         modelBuilder.Entity<BranchRequest>()
             .HasOne(br => br.Restaurant)
-            .WithMany()
+            .WithMany(r => r.BranchRequests)
             .HasForeignKey(br => br.RestaurantId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+
+        // Table
+
+        modelBuilder.Entity<Table>().HasKey(t => new { t.TableNumber, t.BranchId });
+        modelBuilder.Entity<Table>().HasIndex(t => new { t.TableNumber, t.BranchId }).IsUnique();
+        modelBuilder.Entity<Table>()
+            .HasOne(t => t.Branch)
+            .WithMany(b => b.Tables)
+            .HasForeignKey(t => t.BranchId)
             .OnDelete(DeleteBehavior.Cascade);
 
     }

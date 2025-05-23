@@ -6,9 +6,10 @@ using OrdrMate.Repositories;
 
 namespace OrdrMate.Services;
 
-public class ManagerService(IManagerRepo r, IRestaurantRepo rr, IConfiguration c) {
+public class ManagerService(IManagerRepo r, IRestaurantRepo rr, IConfiguration c, IBranchRepo branchRepo) {
     private readonly IManagerRepo _repo = r;
     private readonly IRestaurantRepo _restaurantRepo = rr;
+    private readonly IBranchRepo _branchRepo = branchRepo;
     private readonly IConfiguration _config = c;
 
     public async Task<IEnumerable<ManagerDTO>> GetAllManagers(){
@@ -56,6 +57,7 @@ public class ManagerService(IManagerRepo r, IRestaurantRepo rr, IConfiguration c
         var jwtService = new JWTService(_config);
 
         var restaurantId = "";
+        var branchId = "";
 
         if (manager.Role == ManagerRole.TopManager)
         {
@@ -63,6 +65,17 @@ public class ManagerService(IManagerRepo r, IRestaurantRepo rr, IConfiguration c
             if (restaurant != null)
             {
                 restaurantId = restaurant.Id;
+                branchId = "HEAD";
+            }
+        }
+
+        else if (manager.Role == ManagerRole.BranchManager)
+        {
+            var branch = await _branchRepo.GetBranchByManagerId(manager.Id);
+            if (branch != null)
+            {
+                restaurantId = branch.RestaurantId;
+                branchId = branch.Id;
             }
         }
 
@@ -71,6 +84,7 @@ public class ManagerService(IManagerRepo r, IRestaurantRepo rr, IConfiguration c
             Token = jwtService.GenerateJWT(manager.Id, manager.Role),
             Role = manager.Role.ToString(),
             RestaurantId = restaurantId,
+            BranchId = branchId
         };
     }
 }

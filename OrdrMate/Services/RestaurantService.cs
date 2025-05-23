@@ -106,4 +106,29 @@ public class RestaurantService(IRestaurantRepo r, IManagerRepo m)
         }
     }
 
+    public async Task<List<RestaurantDTO>> GetAllRestaurants()
+    {
+        try
+        {
+            var restaurants = await _repo.GetAllRestaurants();
+            var responseDtos = new List<RestaurantDTO>();
+            foreach (var restaurant in restaurants)
+            {
+                var responseDto = new RestaurantDTO
+                {
+                    Id = restaurant.Id,
+                    Name = restaurant.Name,
+                };
+                if (restaurant.Email != null) responseDto.Email = restaurant.Email;
+                if (restaurant.Phone != null) responseDto.Phone = restaurant.Phone;
+                responseDtos.Add(responseDto);
+            }
+            return responseDtos;
+        }
+        catch (Exception e)
+        {
+            throw new Exception($"Error getting all restaurants: {e.Message}");
+        }
+    }
+
 }

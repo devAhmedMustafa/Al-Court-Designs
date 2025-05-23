@@ -28,11 +28,12 @@ builder.Services.AddDbContext<OrdrMateDbContext>(options =>
 // CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigin", policy =>
+    // Allow all origins, methods, and headers
+    options.AddPolicy("AllowSpecificOrigin", builder =>
     {
-        policy.WithOrigins("http://localhost:5173")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        builder.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
     });
 });
 
@@ -46,6 +47,14 @@ builder.Services.AddScoped<RestaurantService, RestaurantService>();
 
 builder.Services.AddScoped<IItemRepo, ItemRepo>();
 builder.Services.AddScoped<ItemService, ItemService>();
+
+builder.Services.AddScoped<IBranchRepo, BranchRepo>();
+builder.Services.AddScoped<BranchService, BranchService>();
+
+builder.Services.AddScoped<IBranchRequestRepo, BranchRequestRepo>();
+
+builder.Services.AddScoped<ITableRepo, TableRepo>();
+builder.Services.AddScoped<TableService, TableService>();
 
 builder.Services.AddControllers();
 
@@ -74,10 +83,18 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("CanManageRestaurant", policy =>
         policy.Requirements.Add(new ManageRestaurantRequirement()));
+
+    options.AddPolicy("Admin", policy =>
+        policy.Requirements.Add(new AdminRequirement()));
+
+    options.AddPolicy("BranchManager", policy =>
+        policy.Requirements.Add(new BranchManagerRequirement()));
 });
 
 // Authorization Handlers
 builder.Services.AddScoped<IAuthorizationHandler, ManageRestaurantHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, AdminHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, BranchManagerHandler>();
 
 
 var app = builder.Build();

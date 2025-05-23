@@ -7,6 +7,7 @@ sequenceDiagram
     participant AdminAuthorization
     participant BranchService
     participant BranchRepository
+    participant ManagerRepo
 
     ManagerClient->>+RequestBranchEndpoint: POST /request-branch
     RequestBranchEndpoint->>+CanManageRestaurantAuth: Check if user can manage restaurant
@@ -26,6 +27,8 @@ sequenceDiagram
     RequestBranchEndpoint->>+BranchRequestRepository: Get branch request
     BranchRequestRepository-->>-RequestBranchEndpoint: Branch request
     RequestBranchEndpoint->>+BranchService: Create branch
+    BranchService->>+ManagerRepo: Create branch manager
+    ManagerRepo-->>-BranchService: Branch manager created
     BranchService->>+BranchRepository: Create branch
     BranchRepository-->>-BranchService: Branch created
     BranchService-->>-RequestBranchEndpoint: Branch created

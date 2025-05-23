@@ -37,4 +37,9 @@ public class RestaurantRepo(OrdrMateDbContext c) : IRestaurantRepo
         return await _db.Restaurant
             .FirstOrDefaultAsync(r => r.ManagerId == managerId);
     }
+
+    public async Task<IEnumerable<Restaurant>> GetAllRestaurants()
+    {
+        return await _db.Restaurant.ToListAsync();
+    }
 }

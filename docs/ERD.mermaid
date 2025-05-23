@@ -1,7 +1,9 @@
 erDiagram
     
-    Manager{
-        id uuid PK
+    Manager {
+        id varchar(255) PK
+        username varchar(255) UK
+        password varchar(255)
         role int
     }
 
@@ -16,6 +18,8 @@ erDiagram
         id uuid PK
         latitude float
         longitude float
+        address varchar
+        phone varchar
     }
 
     Item {
@@ -33,9 +37,16 @@ erDiagram
         restaurantId uuid FK
     }
 
+    Table {
+        branchId uuid FK
+        tableNumber int
+        seats int
+    }
+
     Restaurant ||--|{ Branch : has
     Restaurant ||--o{ Item : includes
     Manager ||--o| Restaurant : manages
     Manager ||--o| Branch : manages
     Item ||--o| Category : "belongs to"
     Restaurant ||--o| Category : "has"
+    Branch ||--o| Table : has

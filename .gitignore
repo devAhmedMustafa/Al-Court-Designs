@@ -16,4 +16,6 @@ uploads
 *.jpg
 *.jpeg
 
+playground
+
 .env
