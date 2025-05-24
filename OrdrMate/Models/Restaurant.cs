@@ -12,4 +12,5 @@ public class Restaurant
     public List<Branch> Branches { get; set; } = [];
     public List<BranchRequest> BranchRequests { get; set; }
     public List<Item> Items { get; set; } = [];
+    public List<Kitchen> Kitchens { get; set; } = [];
 }

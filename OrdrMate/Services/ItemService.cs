@@ -19,7 +19,9 @@ public class ItemService(IItemRepo itemRepo)
                 ImageUrl = item.ImageUrl,
                 Price = item.Price,
                 CategoryName = item.Category,
-                RestaurantId = item.RestaurantId
+                RestaurantId = item.RestaurantId,
+                KitchenId = item.KitchenId,
+                PreperationTime = item.PreparationTime
             };
 
             var addedItem = await _itemRepo.AddItem(newItem);
@@ -36,7 +38,9 @@ public class ItemService(IItemRepo itemRepo)
                 Description = addedItem.Description,
                 ImageUrl = addedItem.ImageUrl,
                 Price = addedItem.Price,
-                Category = addedItem.CategoryName
+                Category = addedItem.CategoryName,
+                PreparationTime = addedItem.PreperationTime,
+                KitchenName = addedItem.Kitchen?.Name ?? string.Empty
             };
 
         }
@@ -62,7 +66,9 @@ public class ItemService(IItemRepo itemRepo)
             Description = item.Description,
             ImageUrl = item.ImageUrl,
             Price = item.Price,
-            Category = item.CategoryName
+            Category = item.CategoryName,
+            PreparationTime = item.PreperationTime,
+            KitchenName = item.Kitchen?.Name ?? string.Empty
         };
     }
 
@@ -87,7 +93,9 @@ public class ItemService(IItemRepo itemRepo)
             Description = item.Description,
             ImageUrl = item.ImageUrl,
             Price = item.Price,
-            Category = item.CategoryName
+            Category = item.CategoryName,
+            PreparationTime = item.PreperationTime,
+            KitchenName = item.Kitchen?.Name ?? string.Empty
         });
     }
 
@@ -99,7 +107,9 @@ public class ItemService(IItemRepo itemRepo)
             Description = updatedItem.Description,
             ImageUrl = updatedItem.ImageUrl,
             Price = updatedItem.Price,
-            CategoryName = updatedItem.Category
+            CategoryName = updatedItem.Category,
+            KitchenId = updatedItem.KitchenId,
+            PreperationTime = updatedItem.PreparationTime
         };
 
         var updated = await _itemRepo.UpdateItem(id, item);
@@ -116,7 +126,9 @@ public class ItemService(IItemRepo itemRepo)
             Description = updated.Description,
             ImageUrl = updated.ImageUrl,
             Price = updated.Price,
-            Category = updated.CategoryName
+            Category = updated.CategoryName,
+            PreparationTime = updated.PreperationTime,
+            KitchenName = updated.Kitchen?.Name ?? string.Empty
         };
 
     }

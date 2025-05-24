@@ -12,6 +12,7 @@ erDiagram
         name varchar 
         phone varchar
         email varchar
+        managerId uuid FK
     }
 
     Branch {
@@ -20,6 +21,8 @@ erDiagram
         longitude float
         address varchar
         phone varchar
+        restaurantId uuid FK
+        managerId uuid FK
     }
 
     Item {
@@ -30,6 +33,10 @@ erDiagram
         sizesAvailable varchar(255)
         customizations JSON
         preperationTime float
+        description varchar
+        restaurantId uuid FK
+        categoryId uuid FK
+        kitchenId uuid FK
     }
     
     Category {
@@ -43,6 +50,19 @@ erDiagram
         seats int
     }
 
+    Kitchen {
+        id uuid PK
+        restaurantId uuid FK
+        name varchar
+    }
+
+    KitchenPower {
+        branchId uuid FK
+        kitchenId uuid FK
+        status varchar
+        count int
+    }
+
     Restaurant ||--|{ Branch : has
     Restaurant ||--o{ Item : includes
     Manager ||--o| Restaurant : manages
@@ -50,3 +70,6 @@ erDiagram
     Item ||--o| Category : "belongs to"
     Restaurant ||--o| Category : "has"
     Branch ||--o| Table : has
+    Restaurant ||--o| Kitchen : has
+    Branch ||--o| BranchKitchen : has
+    Item o{ --|| Kitchen : "prepared by"

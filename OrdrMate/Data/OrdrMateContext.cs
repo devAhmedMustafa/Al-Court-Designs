@@ -13,6 +13,8 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
     public DbSet<Branch> Branch => Set<Branch>();
     public DbSet<BranchRequest> BranchRequest => Set<BranchRequest>();
     public DbSet<Table> Table => Set<Table>();
+    public DbSet<Kitchen> Kitchen => Set<Kitchen>();
+    public DbSet<KitchenPower> KitchenPower => Set<KitchenPower>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -58,6 +60,13 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
             .HasForeignKey(i => i.RestaurantId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<Item>()
+            .HasOne(i => i.Kitchen)
+            .WithMany()
+            .HasForeignKey(i => i.KitchenId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.SetNull);
+
         // Branch
 
         modelBuilder.Entity<Branch>().HasKey(b => b.Id);
@@ -94,6 +103,28 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
             .HasOne(t => t.Branch)
             .WithMany(b => b.Tables)
             .HasForeignKey(t => t.BranchId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Kitchen
+        
+        modelBuilder.Entity<Kitchen>().HasKey(k => k.Id);
+        modelBuilder.Entity<Kitchen>().HasIndex(k => new { k.Name, k.RestaurantId }).IsUnique();
+        modelBuilder.Entity<Kitchen>()
+            .HasOne(k => k.Restaurant)
+            .WithMany(r => r.Kitchens)
+            .HasForeignKey(k => k.RestaurantId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // KitchenPower
+
+        modelBuilder.Entity<KitchenPower>().HasKey(kp => new { kp.BranchId, kp.KitchenId });
+        modelBuilder.Entity<KitchenPower>()
+            .HasIndex(kp => new { kp.BranchId, kp.KitchenId })
+            .IsUnique();
+        modelBuilder.Entity<KitchenPower>()
+            .HasOne(kp => kp.Branch)
+            .WithMany()
+            .HasForeignKey(kp => kp.BranchId)
             .OnDelete(DeleteBehavior.Cascade);
 
     }

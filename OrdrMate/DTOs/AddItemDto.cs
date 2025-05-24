@@ -12,6 +12,7 @@ public class AddItemDto
 
     [Range(0.0, double.MaxValue, ErrorMessage = "Preparation time must be greater than 0")]
     public decimal PreparationTime { get; set; } = 0.0m;
+    [Required] public required string KitchenId { get; set; }
     [Required] public string Category { get; set; } = string.Empty;
     [Required] public string RestaurantId { get; set; } = string.Empty;
 }

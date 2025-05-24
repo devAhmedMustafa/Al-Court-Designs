@@ -8,4 +8,5 @@ public class UpdateItemDto
     public decimal Price { get; set; } = 0.0m;
     public decimal PreparationTime { get; set; } = 0.0m;
     public string Category { get; set; } = string.Empty;
+    public string KitchenId { get; set; } = string.Empty;
 }

@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace OrdrMate.DTOs;
 
 public class ItemDto
@@ -7,6 +9,7 @@ public class ItemDto
     public string Description { get; set; } = string.Empty;
     public string ImageUrl { get; set; } = string.Empty;
     public decimal Price { get; set; } = 0.0m;
-    public decimal PreparationTime { get; set; } = 0.0m;
-    public string Category { get; set; } = string.Empty;
+    public required decimal PreparationTime { get; set; } = 0.0m;
+    public required string Category { get; set; } = string.Empty;
+    [Required] public required string KitchenName { get; set; }
 }
