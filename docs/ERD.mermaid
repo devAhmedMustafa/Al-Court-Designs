@@ -1,6 +1,6 @@
 erDiagram
     
-    Manager {
+    User {
         id varchar(255) PK
         username varchar(255) UK
         password varchar(255)
@@ -63,13 +63,50 @@ erDiagram
         count int
     }
 
+    Order {
+        id uuid PK
+        branchId uuid FK
+        customerId uuid FK
+        orderTime timestamp
+        orderDate date
+        totalAmount float
+        status varchar
+        paymentMethod varchar
+        paymentStatus varchar
+    }
+
+    OrderItem {
+        orderId uuid FK
+        itemId uuid FK
+        quantity int
+    }
+
+    Takeaway {
+        orderNum int
+        orderId uuid FK
+    }
+
+    Indoor {
+        orderId uuid FK
+        tableNumber int
+        branchId uuid FK
+    }
+
     Restaurant ||--|{ Branch : has
     Restaurant ||--o{ Item : includes
-    Manager ||--o| Restaurant : manages
-    Manager ||--o| Branch : manages
+    User ||--o| Restaurant : manages
+    User ||--o| Branch : manages
     Item ||--o| Category : "belongs to"
     Restaurant ||--o| Category : "has"
     Branch ||--o| Table : has
     Restaurant ||--o| Kitchen : has
-    Branch ||--o| BranchKitchen : has
+    Branch ||--|{ KitchenPower : has
     Item o{ --|| Kitchen : "prepared by"
+    User ||--o| Order : places
+    Order ||--|{ OrderItem : contains
+    Order ||--o| Takeaway : "is"
+    Order ||--o| Indoor : "is"
+    Branch ||--o{ Indoor : "serves"
+    Table ||--o| Indoor : "assigned to"
+    Order o{ -- || Branch : "placed at"
+    OrderItem o{--|| Item : "contains"
