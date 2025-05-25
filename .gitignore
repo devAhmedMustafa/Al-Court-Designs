@@ -20,5 +20,5 @@ playground
 
 .env
 
-application.json
-application.development.json
+appsettings.json
+appsettings.development.json
