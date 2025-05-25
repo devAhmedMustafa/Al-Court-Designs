@@ -10,4 +10,5 @@ public interface IRestaurantRepo
 
     Task<Restaurant?> GetRestaurantByManagerId(string managerId);
     Task<IEnumerable<Restaurant>> GetAllRestaurants();
+    Task<IEnumerable<Category>> GetRestaurantCategories(string restaurantId);
 }

@@ -7,7 +7,7 @@ public class Restaurant
     public string Phone { get; set; }
     public string Email { get; set; }
     public required string ManagerId { get; set; }
-    public Manager Manager { get; set; }
+    public User Manager { get; set; }
     public List<Category> Categories { get; set; } = [];
     public List<Branch> Branches { get; set; } = [];
     public List<BranchRequest> BranchRequests { get; set; }

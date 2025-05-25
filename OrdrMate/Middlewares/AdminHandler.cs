@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
-using OrdrMate.Middlewares;
-using OrdrMate.Models;
+
+using OrdrMate.Enums;
 
 namespace OrdrMate.Middlewares;
 
@@ -11,7 +11,7 @@ public class AdminHandler : AuthorizationHandler<AdminRequirement>
         AdminRequirement requirement
     )
     {
-        if (context.User.IsInRole(ManagerRole.Admin.ToString()))
+        if (context.User.IsInRole(UserRole.Admin.ToString()))
         {
             context.Succeed(requirement);
         }

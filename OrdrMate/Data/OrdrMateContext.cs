@@ -6,7 +6,7 @@ namespace OrdrMate.Data;
 public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options) 
     : DbContext (options)
 {
-    public DbSet<Manager> Manager => Set<Manager>();
+    public DbSet<User> User => Set<User>();
     public DbSet<Restaurant> Restaurant => Set<Restaurant>();
     public DbSet<Item> Item => Set<Item>();
     public DbSet<Category> Category => Set<Category>();
@@ -22,8 +22,8 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
 
         // Manager
 
-        modelBuilder.Entity<Manager>().HasKey(m => m.Id);
-        modelBuilder.Entity<Manager>().HasIndex(m => m.Username).IsUnique();
+        modelBuilder.Entity<User>().HasKey(m => m.Id);
+        modelBuilder.Entity<User>().HasIndex(m => m.Username).IsUnique();
 
         // Restaurant
 

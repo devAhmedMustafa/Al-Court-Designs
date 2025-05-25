@@ -39,7 +39,7 @@ builder.Services.AddCors(options =>
 
 // Repositories and Services
 
-builder.Services.AddScoped<IManagerRepo, ManagerRepo>();
+builder.Services.AddScoped<IUserRepo, ManagerRepo>();
 builder.Services.AddScoped<ManagerService, ManagerService>();
 
 builder.Services.AddScoped<IRestaurantRepo, RestaurantRepo>();
@@ -58,6 +58,8 @@ builder.Services.AddScoped<TableService, TableService>();
 
 builder.Services.AddScoped<IKitchenRepo, KitchenRepo>();
 builder.Services.AddScoped<KitchenService, KitchenService>();
+
+builder.Services.AddScoped<CustomerService, CustomerService>();
 
 builder.Services.AddControllers();
 

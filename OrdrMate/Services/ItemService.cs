@@ -1,6 +1,5 @@
 namespace OrdrMate.DTOs;
 
-using OrdrMate.DTOs;
 using OrdrMate.Models;
 using OrdrMate.Repositories;
 

@@ -42,4 +42,21 @@ public class RestaurantRepo(OrdrMateDbContext c) : IRestaurantRepo
     {
         return await _db.Restaurant.ToListAsync();
     }
+
+    public async Task<IEnumerable<Category>> GetRestaurantCategories(string restaurantId)
+    {
+        var restaurant = await _db.Restaurant
+            .Include(r => r.Categories)
+            .FirstOrDefaultAsync(r => r.Id == restaurantId);
+        if (restaurant == null)
+        {
+            throw new InvalidOperationException($"Restaurant with id {restaurantId} does not exist.");
+        }
+
+        return restaurant.Categories.Select(c => new Category
+        {
+            Name = c.Name,
+            RestaurantId = c.RestaurantId
+        }).ToList();
+    }
 }

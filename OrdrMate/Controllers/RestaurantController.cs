@@ -85,4 +85,22 @@ public class RestaurantController(RestaurantService r) : ControllerBase
             return BadRequest(new { err = e.Message });
         }
     }
+
+    [HttpGet("categories/{restaurantId}")]
+    public async Task<ActionResult<List<CategoryDto>>> GetRestaurantCategories(string restaurantId)
+    {
+        try
+        {
+            var categories = await _service.GetRestaurantCategories(restaurantId);
+            if (categories == null || !categories.Any())
+            {
+                return NotFound(new { err = "No categories found for this restaurant" });
+            }
+            return Ok(categories);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new { err = e.Message });
+        }
+    }
 }

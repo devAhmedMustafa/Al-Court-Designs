@@ -1,6 +1,5 @@
 namespace OrdrMate.Services;
 
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using OrdrMate.DTOs;
 using OrdrMate.Models;
 using OrdrMate.Repositories;

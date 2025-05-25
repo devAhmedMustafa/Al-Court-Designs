@@ -4,17 +4,17 @@ using OrdrMate.Repositories;
 
 namespace OrdrMate.Services;
 
-public class RestaurantService(IRestaurantRepo r, IManagerRepo m)
+public class RestaurantService(IRestaurantRepo r, IUserRepo m)
 {
     private readonly IRestaurantRepo _repo = r;
-    private readonly IManagerRepo _managerRepo = m;
+    private readonly IUserRepo _managerRepo = m;
 
     public async Task<RestaurantDTO> CreateRestaurant(CreateRestaurantDto dto)
     {
         try
         {
 
-            var manager = await _managerRepo.GetManagerByUsername(dto.ManagerUsername);
+            var manager = await _managerRepo.GetUserByUsername(dto.ManagerUsername);
 
             if (manager == null)
             {
@@ -128,6 +128,22 @@ public class RestaurantService(IRestaurantRepo r, IManagerRepo m)
         catch (Exception e)
         {
             throw new Exception($"Error getting all restaurants: {e.Message}");
+        }
+    }
+
+    public async Task<List<CategoryDto>> GetRestaurantCategories(string restaurantId)
+    {
+        try
+        {
+            var categories = await _repo.GetRestaurantCategories(restaurantId);
+            return [.. categories.Select(c => new CategoryDto
+            {
+                Name = c.Name,
+            })];
+        }
+        catch (Exception e)
+        {
+            throw new Exception($"Error getting restaurant categories: {e.Message}");
         }
     }
 

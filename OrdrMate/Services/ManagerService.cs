@@ -3,35 +3,43 @@ using OrdrMate.DTOs;
 using OrdrMate.Middlewares;
 using OrdrMate.Models;
 using OrdrMate.Repositories;
+using OrdrMate.Enums;
 
 namespace OrdrMate.Services;
 
-public class ManagerService(IManagerRepo r, IRestaurantRepo rr, IConfiguration c, IBranchRepo branchRepo) {
-    private readonly IManagerRepo _repo = r;
+public class ManagerService(IUserRepo r, IRestaurantRepo rr, IConfiguration c, IBranchRepo branchRepo)
+{
+    private readonly IUserRepo _repo = r;
     private readonly IRestaurantRepo _restaurantRepo = rr;
     private readonly IBranchRepo _branchRepo = branchRepo;
     private readonly IConfiguration _config = c;
 
-    public async Task<IEnumerable<ManagerDTO>> GetAllManagers(){
+    public async Task<IEnumerable<ManagerDTO>> GetAllManagers()
+    {
         var managers = await _repo.GetAll();
-        return managers.Select(m => new ManagerDTO{
+        return managers.Select(m => new ManagerDTO
+        {
             Id = m.Id,
             Username = m.Username,
             Role = m.Role
         });
     }
 
-    public async Task<ManagerDTO> CreateManager(CreateManagerDTO dto){
+    public async Task<ManagerDTO> CreateManager(CreateManagerDTO dto)
+    {
 
-        try {
-            var manager = new Manager {
+        try
+        {
+            var manager = new User
+            {
                 Username = dto.Username,
                 Password = BCrypt.Net.BCrypt.HashPassword(dto.Password)
             };
 
-            var createdManager = await _repo.CreateManager(manager);
+            var createdManager = await _repo.CreateUser(manager);
 
-            var managerDto = new ManagerDTO {
+            var managerDto = new ManagerDTO
+            {
                 Id = createdManager.Id,
                 Username = createdManager.Username,
                 Role = createdManager.Role
@@ -39,16 +47,18 @@ public class ManagerService(IManagerRepo r, IRestaurantRepo rr, IConfiguration c
 
             return managerDto;
         }
-        catch(DbUpdateException ex){
+        catch (DbUpdateException ex)
+        {
             if (ex.InnerException!.Message.Contains("duplicate"))
                 throw new Exception("Username already exists");
             throw;
         }
     }
 
-    public async Task<LoginSuccessDto> AuthenticateManager(LoginDTO data) {
+    public async Task<LoginSuccessDto> AuthenticateManager(LoginDTO data)
+    {
 
-        var manager = await _repo.GetManagerByUsername(data.Username)
+        var manager = await _repo.GetUserByUsername(data.Username)
             ?? throw new Exception("Invalid Credentials");
 
         if (!BCrypt.Net.BCrypt.Verify(data.Password, manager.Password))
@@ -59,7 +69,7 @@ public class ManagerService(IManagerRepo r, IRestaurantRepo rr, IConfiguration c
         var restaurantId = "";
         var branchId = "";
 
-        if (manager.Role == ManagerRole.TopManager)
+        if (manager.Role == UserRole.TopManager)
         {
             var restaurant = await _restaurantRepo.GetRestaurantByManagerId(manager.Id);
             if (restaurant != null)
@@ -69,7 +79,7 @@ public class ManagerService(IManagerRepo r, IRestaurantRepo rr, IConfiguration c
             }
         }
 
-        else if (manager.Role == ManagerRole.BranchManager)
+        else if (manager.Role == UserRole.BranchManager)
         {
             var branch = await _branchRepo.GetBranchByManagerId(manager.Id);
             if (branch != null)

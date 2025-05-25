@@ -1,8 +1,6 @@
 namespace OrdrMate.Services;
 
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using OrdrMate.DTOs;
-using OrdrMate.Models;
 using OrdrMate.Repositories;
 
 public class TableService
