@@ -80,11 +80,6 @@ public class ItemService(IItemRepo itemRepo)
     {
         var items = await _itemRepo.GetItemsByRestaurantId(restaurantId);
 
-        if (items == null || !items.Any())
-        {
-            throw new Exception("No items found for this restaurant");
-        }
-
         return items.Select(item => new ItemDto
         {
             Id = item.Id,

@@ -16,9 +16,13 @@ public class CustomerService
         _configuration = configuration;
     }
 
-    public async Task AuthenticateCustomer(GoogleLoginRequestDto dto)
+    public async Task<GoogleLoginCredentialsDto> AuthenticateCustomer(GoogleLoginRequestDto dto)
     {
-        var validPayload = await GoogleJsonWebSignature.ValidateAsync(dto.IdToken);
+        var validPayload = await GoogleJsonWebSignature.ValidateAsync(dto.IdToken, new GoogleJsonWebSignature.ValidationSettings
+        {
+            Audience = [_configuration["Authentication:Google:ClientId"]]
+        });
+
         if (validPayload == null) throw new Exception("Invalid Google ID token");
 
         var user = await _userRepo.GetUserByUsername(validPayload.Email);
@@ -38,7 +42,7 @@ public class CustomerService
         var token = jwtService.GenerateJWT(user.Id, user.Role);
         if (token == null) throw new Exception("Error generating JWT token");
 
-        var response = new GoogleLoginCredentialsDto
+        return new GoogleLoginCredentialsDto
         {
             Token = token,
             Email = user.Username,

@@ -71,8 +71,19 @@ erDiagram
         orderDate date
         totalAmount float
         status varchar
+        isPaid boolean
+    }
+
+    Payment {
+        id uuid PK
+        orderId uuid FK
+        amount float
         paymentMethod varchar
-        paymentStatus varchar
+        provider varchar
+        status varchar
+        transactionId varchar(255) UK
+        paidAt datetime
+        externalRef varchar(255)
     }
 
     OrderItem {
@@ -110,3 +121,4 @@ erDiagram
     Table ||--o| Indoor : "assigned to"
     Order o{ -- || Branch : "placed at"
     OrderItem o{--|| Item : "contains"
+    Order ||--|| Payment : "has"

@@ -1,4 +1,4 @@
-using OrdrMate.Models;
+using OrdrMate.Enums;
 
 namespace OrdrMate.DTOs;
 
