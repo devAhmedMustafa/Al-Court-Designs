@@ -1,0 +1,27 @@
+sequenceDiagram
+
+actor Customer
+participant OrderEndpoints
+participant OrderServices
+participant OrderRepository
+participant OrdersManager
+participant BranchQueueManager
+participant OrderQueue
+participant OrdersSocket
+actor BranchManager
+
+Customer->>+OrderEndpoints: Place Order
+OrderEndpoints->>+OrderServices: Place Order
+OrderServices->>+OrderRepository: Save Order
+OrderRepository-->>-OrderServices: Order Saved
+OrderServices-->>-OrderEndpoints: Order Confirmation
+OrderEndpoints-->>-Customer: Order Confirmation
+OrderRepository-)OrdersManager: Notify Order Created
+OrdersManager->>+BranchQueueManager: Add Order to Right Restaurant Queue
+BranchQueueManager->>+OrderQueue: Add Order to Correct Kitchen Queue
+OrderQueue-->>-BranchQueueManager: Order Added to Queue
+BranchQueueManager-->>-OrdersManager: Order Added to Queue
+OrdersManager->>+OrdersSocket: Notify Order Created
+OrdersSocket-->>-BranchManager: Notify Order Created
+BranchManager->>+OrdersSocket: Acknowledge Order Notification
+ 

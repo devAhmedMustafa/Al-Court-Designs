@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OrdrMate.DTOs;
+using OrdrMate.DTOs.Kitchen;
 using OrdrMate.Services;
 
 namespace OrdrMate.Controllers;

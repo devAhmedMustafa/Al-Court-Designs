@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OrdrMate.DTOs;
+using OrdrMate.DTOs.Branch;
 using OrdrMate.Repositories;
 using OrdrMate.Services;
 
@@ -109,8 +109,9 @@ public class BranchController : ControllerBase
             return NotFound($"Branch request with id {id} not found.");
         }
 
-        var branchCreated = await _branchService.CreateBranch(new BranchDto {
-            Lantitude = branchRequest.Lantitude,
+        var branchCreated = await _branchService.CreateBranch(new BranchDto
+        {
+            Latitude = branchRequest.Lantitude,
             Longitude = branchRequest.Longitude,
             BranchAddress = branchRequest.Address,
             BranchPhoneNumber = branchRequest.Phone,
@@ -129,6 +130,21 @@ public class BranchController : ControllerBase
         }
 
         return CreatedAtAction(nameof(GetBranchRequestById), new { id = branchCreated.BranchId }, branchCreated);
+    }
+
+    [HttpGet]
+    [Route("restaurant/{restaurantId}")]
+    public async Task<IActionResult> GetRestaurantBranches(string restaurantId)
+    {
+        try
+        {
+            var branches = await _branchService.GetRestaurantBranches(restaurantId);
+            return Ok(branches);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound($"Restaurant with ID {restaurantId} not found: {ex.Message}");
+        }
     }
 
 }

@@ -23,6 +23,13 @@ public class BranchRepo : IBranchRepo
         return await _context.Branch.ToListAsync();
     }
 
+    public async Task<IEnumerable<Branch>> GetRestaurantBranches(string restaurantId)
+    {
+        return await _context.Branch
+            .Where(b => b.RestaurantId == restaurantId)
+            .ToListAsync();
+    }
+
     public async Task<Branch> GetBranchByManagerId(string managerId)
     {
         return await _context.Branch

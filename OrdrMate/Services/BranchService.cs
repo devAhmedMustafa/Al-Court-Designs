@@ -1,6 +1,7 @@
 namespace OrdrMate.Services;
 
-using OrdrMate.DTOs;
+using OrdrMate.DTOs.Branch;
+using OrdrMate.DTOs.User;
 using OrdrMate.Models;
 using OrdrMate.Repositories;
 using OrdrMate.Utils;
@@ -28,7 +29,7 @@ public class BranchService
         return new BranchDto
         {
             BranchId = branch.Id,
-            Lantitude = branch.Lantitude,
+            Latitude = branch.Lantitude,
             Longitude = branch.Longitude,
             BranchAddress = branch.Address,
             RestaurantId = branch.RestaurantId,
@@ -41,7 +42,20 @@ public class BranchService
         return branches.Select(b => new BranchDto
         {
             BranchId = b.Id,
-            Lantitude = b.Lantitude,
+            Latitude = b.Lantitude,
+            Longitude = b.Longitude,
+            BranchAddress = b.Address,
+            RestaurantId = b.RestaurantId,
+        });
+    }
+
+    public async Task<IEnumerable<BranchDto>> GetRestaurantBranches(string restaurantId)
+    {
+        var branches = await _branchRepo.GetRestaurantBranches(restaurantId);
+        return branches.Select(b => new BranchDto
+        {
+            BranchId = b.Id,
+            Latitude = b.Lantitude,
             Longitude = b.Longitude,
             BranchAddress = b.Address,
             RestaurantId = b.RestaurantId,
@@ -71,11 +85,11 @@ public class BranchService
         {
             throw new Exception("Failed to create manager.");
         }
-    
+
         var branch = new Branch
         {
             Id = Guid.NewGuid().ToString(),
-            Lantitude = branchDto.Lantitude,
+            Lantitude = branchDto.Latitude,
             Longitude = branchDto.Longitude,
             Address = branchDto.BranchAddress,
             Phone = branchDto.BranchPhoneNumber,

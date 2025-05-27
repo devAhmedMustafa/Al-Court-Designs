@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using OrdrMate.DTOs;
+using OrdrMate.DTOs.User;
 using OrdrMate.Middlewares;
 using OrdrMate.Models;
 using OrdrMate.Repositories;

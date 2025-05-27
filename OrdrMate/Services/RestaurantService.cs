@@ -1,4 +1,4 @@
-using OrdrMate.DTOs;
+using OrdrMate.DTOs.Restaurant;
 using OrdrMate.Models;
 using OrdrMate.Repositories;
 

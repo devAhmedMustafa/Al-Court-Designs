@@ -15,6 +15,11 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
     public DbSet<Table> Table => Set<Table>();
     public DbSet<Kitchen> Kitchen => Set<Kitchen>();
     public DbSet<KitchenPower> KitchenPower => Set<KitchenPower>();
+    public DbSet<Order> Order => Set<Order>();
+    public DbSet<Indoor> Indoor => Set<Indoor>();
+    public DbSet<Takeaway> Takeaway => Set<Takeaway>();
+    public DbSet<OrderItem> OrderItem => Set<OrderItem>();
+    public DbSet<Payment> Payment => Set<Payment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -106,7 +111,7 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Kitchen
-        
+
         modelBuilder.Entity<Kitchen>().HasKey(k => k.Id);
         modelBuilder.Entity<Kitchen>().HasIndex(k => new { k.Name, k.RestaurantId }).IsUnique();
         modelBuilder.Entity<Kitchen>()
@@ -125,6 +130,70 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
             .HasOne(kp => kp.Branch)
             .WithMany()
             .HasForeignKey(kp => kp.BranchId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Order
+
+        modelBuilder.Entity<Order>().HasKey(o => o.Id);
+        modelBuilder.Entity<Order>().HasIndex(o => o.OrderDate);
+        modelBuilder.Entity<Order>()
+            .HasOne(o => o.Branch)
+            .WithMany(b => b.Orders)
+            .HasForeignKey(o => o.BranchId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<Order>()
+            .HasOne(o => o.Customer)
+            .WithMany()
+            .HasForeignKey(o => o.CustomerId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        // OrderItem
+        modelBuilder.Entity<OrderItem>().HasKey(oi => new { oi.OrderId, oi.ItemId });
+        modelBuilder.Entity<OrderItem>()
+            .HasOne(oi => oi.Order)
+            .WithMany()
+            .HasForeignKey(oi => oi.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<OrderItem>()
+            .HasOne(oi => oi.Item)
+            .WithMany()
+            .HasForeignKey(oi => oi.ItemId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Payment
+        modelBuilder.Entity<Payment>().HasKey(p => p.Id);
+        modelBuilder.Entity<Payment>()
+            .HasOne(p => p.Order)
+            .WithOne(o => o.Payment)
+            .HasForeignKey<Payment>("OrderId")
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Indoor
+
+        modelBuilder.Entity<Indoor>().HasKey(i => new { i.TableNumber, i.BranchId, i.OrderId });
+        modelBuilder.Entity<Indoor>()
+            .HasOne(i => i.Order)
+            .WithOne()
+            .HasForeignKey<Indoor>(i => i.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<Indoor>()
+            .HasOne(i => i.Branch)
+            .WithMany()
+            .HasForeignKey(i => i.BranchId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Takeaway
+
+        modelBuilder.Entity<Takeaway>().HasKey(t => new { t.OrderId, t.OrderNumber });
+        modelBuilder.Entity<Takeaway>()
+            .HasOne(t => t.Order)
+            .WithOne()
+            .HasForeignKey<Takeaway>(t => t.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<Takeaway>()
+            .HasOne(t => t.Order)
+            .WithMany()
+            .HasForeignKey(t => t.OrderId)
             .OnDelete(DeleteBehavior.Cascade);
 
     }

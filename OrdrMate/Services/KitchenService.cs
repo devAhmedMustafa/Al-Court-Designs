@@ -1,4 +1,4 @@
-using OrdrMate.DTOs;
+using OrdrMate.DTOs.Kitchen;
 using OrdrMate.Repositories;
 
 namespace OrdrMate.Services;

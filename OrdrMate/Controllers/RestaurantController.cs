@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using OrdrMate.DTOs;
+using OrdrMate.DTOs.Restaurant;
 using OrdrMate.Services;
 
 namespace OrdrMate.Controllers;

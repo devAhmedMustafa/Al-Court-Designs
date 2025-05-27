@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using OrdrMate.DTOs;
+using OrdrMate.DTOs.User;
 using OrdrMate.Services;
 
 namespace OrdrMate.Controllers;

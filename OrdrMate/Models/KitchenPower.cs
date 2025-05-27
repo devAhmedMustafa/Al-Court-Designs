@@ -1,11 +1,6 @@
 namespace OrdrMate.Models;
 
-public enum KitchenStatus
-{
-    Active=0,
-    Inactive=1,
-    Maintenance=2
-}
+using OrdrMate.Enums;
 
 public class KitchenPower
 {

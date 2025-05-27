@@ -1,6 +1,6 @@
 namespace OrdrMate.Services;
 
-using OrdrMate.DTOs;
+using OrdrMate.DTOs.Table;
 using OrdrMate.Repositories;
 
 public class TableService

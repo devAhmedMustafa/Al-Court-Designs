@@ -1,7 +1,8 @@
-namespace OrdrMate.DTOs;
+namespace OrdrMate.Services;
 
-using OrdrMate.Models;
 using OrdrMate.Repositories;
+using OrdrMate.Models;
+using OrdrMate.DTOs.Item;
 
 public class ItemService(IItemRepo itemRepo)
 {

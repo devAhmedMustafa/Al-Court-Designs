@@ -61,6 +61,12 @@ builder.Services.AddScoped<KitchenService, KitchenService>();
 
 builder.Services.AddScoped<CustomerService, CustomerService>();
 
+builder.Services.AddScoped<IOrderRepo, OrderRepo>();
+builder.Services.AddScoped<OrderService, OrderService>();
+
+builder.Services.AddScoped<IPaymentRepo, PaymentRepo>();
+builder.Services.AddScoped<PaymentService, PaymentService>();
+
 builder.Services.AddControllers();
 
 // JWT Authentication

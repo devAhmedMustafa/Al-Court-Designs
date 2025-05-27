@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OrdrMate.Services;
 
 namespace OrdrMate.Controllers;
-using OrdrMate.DTOs;
+using OrdrMate.DTOs.Table;
 
 [ApiController]
 [Route("api/[controller]")]

@@ -7,6 +7,7 @@ public interface IBranchRepo
     Task<Branch> GetBranchById(string id);
     Task<Branch> GetBranchByManagerId(string managerId);
     Task<IEnumerable<Branch>> GetAllBranches();
+    Task<IEnumerable<Branch>> GetRestaurantBranches(string restaurantId);
     Task<Branch> CreateBranch(Branch branch);
     Task<bool> DeleteBranch(string id);
     Task<bool> UpdateBranch(Branch branch);

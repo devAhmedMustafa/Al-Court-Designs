@@ -12,5 +12,6 @@ public class Branch
     public User BranchManager { get; set; }
     public Restaurant Restaurant { get; set; }
     public ICollection<Table> Tables { get; set; }
+    public ICollection<Order> Orders { get; set; }
     
 }

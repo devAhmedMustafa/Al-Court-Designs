@@ -1,0 +1,30 @@
+classDiagram
+    class Order {
+        + int orderId
+        + DateTime orderDate
+    }
+
+    class OrderQueue {
+        + Queue~Order~ orders
+        + void addOrder(Order order)
+        + Order getNextOrder()
+        + int getOrderCount()
+    }
+
+    class RestaurantQueueManager {
+        - Map~String, OrderQueue[]~ restaurantQueues
+        + void addOrder(String kitchen, Order order)
+        + Order getNextOrder(String kitchen)
+        + int getOrderCount(String kitchen)
+        + void removeOrder(String kitchen, int orderId)
+        + List~Order~ getOrders(String kitchen)
+        + List~String~ getAllKitchens()
+    }
+
+    class OrdersManager {
+        + Map~String, RestaurantQueueManager~ restaurantManagers
+    }
+
+    OrderQueue "1" -- "0..*" Order : contains
+    RestaurantQueueManager "1" -- "0..*" OrderQueue : manages
+    OrdersManager "1" -- "0..*" RestaurantQueueManager : oversees
