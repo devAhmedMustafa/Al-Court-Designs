@@ -118,6 +118,8 @@ builder.Services.AddScoped<IAuthorizationHandler, ManageRestaurantHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, AdminHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, BranchManagerHandler>();
 
+// AWS S3 Configuration
+
 FirebaseAdmin.FirebaseApp.Create(new FirebaseAdmin.AppOptions()
 {
     Credential = GoogleCredential.FromFile("Keys/firebase-adminsdk.json"),

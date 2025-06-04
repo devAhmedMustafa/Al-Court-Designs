@@ -1,26 +1,22 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace OrdrMate.Controllers;
 
 [ApiController]
 [Route("/api/[controller]")]
-public class UploadController : ControllerBase
+public class UploadController(IWebHostEnvironment env, IConfiguration config, S3Service s3Service) : ControllerBase
 {
 
-    private readonly IWebHostEnvironment _env;
-    private readonly IConfiguration _config;
-
-    public UploadController(IWebHostEnvironment env, IConfiguration config)
-    {
-        _env = env;
-        _config = config;
-    }
+    private readonly IWebHostEnvironment _env = env;
+    private readonly S3Service _s3Service = s3Service;
+    private readonly IConfiguration _config = config;
 
     [HttpPost("presigned-url")]
-    public IActionResult GetUploadInfo([FromBody] UploadRequest request)
+    [Authorize(Roles = "CanManageRestaurant")]
+    public IActionResult GetUploadPresignedUrl([FromBody] UploadRequest request)
     {
         var fileName = $"{Guid.NewGuid()}_{request.FileName}";
-        var fileType = request.FileType;
 
         if (_env.IsDevelopment())
         {
@@ -32,6 +28,41 @@ public class UploadController : ControllerBase
                 uploadUrl,
                 fileUrl
             });
+        }
+        if (_env.IsProduction())
+        {
+            var bucketName = _config["AWS:BucketName"];
+            if (string.IsNullOrEmpty(bucketName)) return StatusCode(500, "Bucket name is not configured.");
+            var presignedUrl = _s3Service.GeneratePresignedUrl(bucketName, fileName, 15);
+            return Ok(new
+            {
+                uploadUrl = presignedUrl,
+                fileName
+            });
+        }
+
+        return Forbid("Not allowed in production");
+    }
+
+    [HttpGet("presigned-url")]
+    public IActionResult GetDownloadPresignedUrl(string filename)
+    {
+        if (_env.IsDevelopment())
+        {
+            var filePath = Path.Combine(_env.ContentRootPath, "uploads", filename);
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound("File not found.");
+            }
+            var fileUrl = $"http://localhost:5126/uploads/{filename}";
+            return Ok(new { fileUrl });
+        }
+        if (_env.IsProduction())
+        {
+            var bucketName = _config["AWS:BucketName"];
+            if (string.IsNullOrEmpty(bucketName)) return StatusCode(500, "Bucket name is not configured.");
+            var presignedUrl = _s3Service.GeneratePresignedUrl(bucketName, filename, 15);
+            return Ok(new { fileUrl = presignedUrl });
         }
 
         return Forbid("Not allowed in production");
