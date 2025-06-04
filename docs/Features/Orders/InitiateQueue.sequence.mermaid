@@ -1,0 +1,7 @@
+stateDiagram
+
+[*] --> InitiateQueue
+InitiateQueue --> FetchBranchesFromDatabase
+FetchBranchesFromDatabase --> AlignBranchPowerToQueues
+AlignBranchPowerToQueues --> ReadyToProcess
+ReadyToProcess --> [*]

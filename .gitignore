@@ -10,4 +10,19 @@ obj/
 *.sln.ide
 *.sln.docstates
 
+# static files
+uploads
+*.png
+*.jpg
+*.jpeg
+
+playground
+publish
+
 .env
+
+appsettings.json
+appsettings.development.json
+
+# SECRET
+Keys

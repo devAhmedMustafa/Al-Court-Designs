@@ -1,0 +1,124 @@
+erDiagram
+    
+    User {
+        id varchar(255) PK
+        username varchar(255) UK
+        password varchar(255)
+        role int
+    }
+
+    Restaurant {
+        id uuid PK
+        name varchar 
+        phone varchar
+        email varchar
+        managerId uuid FK
+    }
+
+    Branch {
+        id uuid PK
+        latitude float
+        longitude float
+        address varchar
+        phone varchar
+        restaurantId uuid FK
+        managerId uuid FK
+    }
+
+    Item {
+        id uuid PK
+        name varchar UK
+        image varchar
+        price float
+        sizesAvailable varchar(255)
+        customizations JSON
+        preperationTime float
+        description varchar
+        restaurantId uuid FK
+        categoryId uuid FK
+        kitchenId uuid FK
+    }
+    
+    Category {
+        name varchar
+        restaurantId uuid FK
+    }
+
+    Table {
+        branchId uuid FK
+        tableNumber int
+        seats int
+    }
+
+    Kitchen {
+        id uuid PK
+        restaurantId uuid FK
+        name varchar
+    }
+
+    KitchenPower {
+        branchId uuid FK
+        kitchenId uuid FK
+        status varchar
+        count int
+    }
+
+    Order {
+        id uuid PK
+        branchId uuid FK
+        customerId uuid FK
+        orderTime timestamp
+        orderDate date
+        totalAmount float
+        status varchar
+        isPaid boolean
+    }
+
+    Payment {
+        id uuid PK
+        orderId uuid FK
+        amount float
+        paymentMethod varchar
+        provider varchar
+        status varchar
+        transactionId varchar(255) UK
+        paidAt datetime
+        externalRef varchar(255)
+    }
+
+    OrderItem {
+        orderId uuid FK
+        itemId uuid FK
+        quantity int
+    }
+
+    Takeaway {
+        orderNum int
+        orderId uuid FK
+    }
+
+    Indoor {
+        orderId uuid FK
+        tableNumber int
+        branchId uuid FK
+    }
+
+    Restaurant ||--|{ Branch : has
+    Restaurant ||--o{ Item : includes
+    User ||--o| Restaurant : manages
+    User ||--o| Branch : manages
+    Item ||--o| Category : "belongs to"
+    Restaurant ||--o| Category : "has"
+    Branch ||--o| Table : has
+    Restaurant ||--o| Kitchen : has
+    Branch ||--|{ KitchenPower : has
+    Item o{ --|| Kitchen : "prepared by"
+    User ||--o| Order : places
+    Order ||--|{ OrderItem : contains
+    Order ||--o| Takeaway : "is"
+    Order ||--o| Indoor : "is"
+    Branch ||--o{ Indoor : "serves"
+    Table ||--o| Indoor : "assigned to"
+    Order o{ -- || Branch : "placed at"
+    OrderItem o{--|| Item : "contains"
+    Order ||--|| Payment : "has"
