@@ -16,13 +16,13 @@ public class S3Service
         _s3Client = new AmazonS3Client(credentials, awsRegion);
     }
 
-    public string GeneratePresignedUrl(string bucketName, string key, int durationInMinutes)
+    public string GeneratePresignedUrl(string bucketName, string key, int durationInMinutes, HttpVerb httpVerb)
     {
         var request = new GetPreSignedUrlRequest
         {
             BucketName = bucketName,
             Key = key,
-            Verb = HttpVerb.PUT,
+            Verb = httpVerb,
             Expires = DateTime.UtcNow.AddMinutes(durationInMinutes),
             ContentType = "application/octet-stream"
         }; 

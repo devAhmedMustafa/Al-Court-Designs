@@ -34,7 +34,7 @@ public class UploadController(IWebHostEnvironment env, IConfiguration config, S3
         {
             var bucketName = _config["AWS:BucketName"];
             if (string.IsNullOrEmpty(bucketName)) return StatusCode(500, "Bucket name is not configured.");
-            var presignedUrl = _s3Service.GeneratePresignedUrl(bucketName, fileUrl, 15);
+            var presignedUrl = _s3Service.GeneratePresignedUrl(bucketName, fileUrl, 15, Amazon.S3.HttpVerb.PUT);
             return Ok(new
             {
                 uploadUrl = presignedUrl,
@@ -62,14 +62,14 @@ public class UploadController(IWebHostEnvironment env, IConfiguration config, S3
         {
             var bucketName = _config["AWS:BucketName"];
             if (string.IsNullOrEmpty(bucketName)) return StatusCode(500, "Bucket name is not configured.");
-            var presignedUrl = _s3Service.GeneratePresignedUrl(bucketName, filename, 15);
+            var presignedUrl = _s3Service.GeneratePresignedUrl(bucketName, filename, 15, Amazon.S3.HttpVerb.GET);
             return Ok(new { fileUrl = presignedUrl });
         }
 
         return Forbid("Not allowed in production");
     }
 
-    [HttpPost("upload")]
+    [HttpPut("upload")]
     public async Task<IActionResult> UploadFile([FromQuery] string filename)
     {
         var form = await Request.ReadFormAsync();
