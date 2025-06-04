@@ -17,14 +17,11 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Navigate to OrdrMate directory
-        run: cd OrdrMate
-
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore ./OrdrMate/OrdrMate.csproj
 
       - name: Publish application
-        run: dotnet publish -c Release -o publish
+        run: dotnet publish ./OrdrMate/OrdrMate.csproj -c Release -o ./OrdrMate/publish 
 
       - name: Prepare SSH key
       
@@ -38,7 +35,7 @@ jobs:
       - name: Copy source code to EC2
         run: |
           rsync -avz -e "ssh -o StrictHostKeyChecking=no -i ec2_key.pem" \
-            ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/app
+            ./OrdrMate/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/app
 
       - name: Build, migrate and restart on EC2
         run: |
