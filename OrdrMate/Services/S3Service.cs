@@ -4,7 +4,7 @@ using Amazon.S3.Model;
 
 public class S3Service
 {
-    private readonly IAmazonS3 _s3Client;
+    private readonly AmazonS3Client _s3Client;
 
     public S3Service(IConfiguration configuration)
     {

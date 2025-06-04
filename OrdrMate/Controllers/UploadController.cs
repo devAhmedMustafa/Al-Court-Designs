@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,15 +14,15 @@ public class UploadController(IWebHostEnvironment env, IConfiguration config, S3
     private readonly IConfiguration _config = config;
 
     [HttpPost("presigned-url")]
-    [Authorize(Roles = "CanManageRestaurant")]
+    [Authorize (Roles = "TopManager")]
     public IActionResult GetUploadPresignedUrl([FromBody] UploadRequest request)
     {
-        var fileName = $"{Guid.NewGuid()}_{request.FileName}";
+        var fileUrl = $"{Guid.NewGuid()}_{request.FileName}";
+        Console.WriteLine($"Role: {User.FindFirst(ClaimTypes.Role)?.Value}");
 
         if (_env.IsDevelopment())
         {
-            var uploadUrl = $"http://localhost:5126/api/upload/upload?filename={fileName}";
-            var fileUrl = $"http://localhost:5126/uploads/{fileName}";
+            var uploadUrl = $"http://localhost:5126/api/upload/upload?filename={fileUrl}";
 
             return Ok(new
             {
@@ -33,18 +34,18 @@ public class UploadController(IWebHostEnvironment env, IConfiguration config, S3
         {
             var bucketName = _config["AWS:BucketName"];
             if (string.IsNullOrEmpty(bucketName)) return StatusCode(500, "Bucket name is not configured.");
-            var presignedUrl = _s3Service.GeneratePresignedUrl(bucketName, fileName, 15);
+            var presignedUrl = _s3Service.GeneratePresignedUrl(bucketName, fileUrl, 15);
             return Ok(new
             {
                 uploadUrl = presignedUrl,
-                fileName
+                fileUrl
             });
         }
 
         return Forbid("Not allowed in production");
     }
 
-    [HttpGet("presigned-url")]
+    [HttpGet("presigned-url/{filename}")]
     public IActionResult GetDownloadPresignedUrl(string filename)
     {
         if (_env.IsDevelopment())

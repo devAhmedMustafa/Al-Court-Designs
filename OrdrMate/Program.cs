@@ -71,6 +71,9 @@ builder.Services.AddScoped<PaymentService, PaymentService>();
 
 builder.Services.AddScoped<CloudMessaging>();
 
+// AWS S3 Configuration
+builder.Services.AddScoped<S3Service>();
+
 // Sockets
 builder.Services.AddScoped<BranchOrdersSocketHandler>();
 builder.Services.AddScoped<CustomerOrdersSocketHandler>();
@@ -117,8 +120,6 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddScoped<IAuthorizationHandler, ManageRestaurantHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, AdminHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, BranchManagerHandler>();
-
-// AWS S3 Configuration
 
 FirebaseAdmin.FirebaseApp.Create(new FirebaseAdmin.AppOptions()
 {
