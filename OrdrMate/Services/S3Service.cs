@@ -24,7 +24,6 @@ public class S3Service
             Key = key,
             Verb = httpVerb,
             Expires = DateTime.UtcNow.AddMinutes(durationInMinutes),
-            ContentType = "application/octet-stream"
         }; 
 
         return _s3Client.GetPreSignedURL(request);
