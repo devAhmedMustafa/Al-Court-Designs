@@ -7,6 +7,7 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
     : DbContext (options)
 {
     public DbSet<User> User => Set<User>();
+    public DbSet<FirebaseToken> FirebaseToken => Set<FirebaseToken>();
     public DbSet<Restaurant> Restaurant => Set<Restaurant>();
     public DbSet<Item> Item => Set<Item>();
     public DbSet<Category> Category => Set<Category>();
@@ -29,6 +30,14 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
 
         modelBuilder.Entity<User>().HasKey(m => m.Id);
         modelBuilder.Entity<User>().HasIndex(m => m.Username).IsUnique();
+
+        // FirebaseToken
+        modelBuilder.Entity<FirebaseToken>().HasKey(ft => ft.Token);
+        modelBuilder.Entity<FirebaseToken>()
+            .HasOne(ft => ft.User)
+            .WithOne()
+            .HasForeignKey<FirebaseToken>(ft => ft.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // Restaurant
 
@@ -128,7 +137,7 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
             .IsUnique();
         modelBuilder.Entity<KitchenPower>()
             .HasOne(kp => kp.Branch)
-            .WithMany()
+            .WithMany(b => b.KitchenPowers)
             .HasForeignKey(kp => kp.BranchId)
             .OnDelete(DeleteBehavior.Cascade);
 
@@ -151,7 +160,7 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
         modelBuilder.Entity<OrderItem>().HasKey(oi => new { oi.OrderId, oi.ItemId });
         modelBuilder.Entity<OrderItem>()
             .HasOne(oi => oi.Order)
-            .WithMany()
+            .WithMany(o => o.OrderItems)
             .HasForeignKey(oi => oi.OrderId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<OrderItem>()

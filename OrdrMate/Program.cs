@@ -7,10 +7,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using OrdrMate.Data;
-using OrdrMate.DTOs;
 using OrdrMate.Middlewares;
 using OrdrMate.Repositories;
 using OrdrMate.Services;
+using OrdrMate.Managers;
+using OrdrMate.Sockets;
+using Google.Apis.Auth.OAuth2;
 
 Env.Load();
 
@@ -67,6 +69,15 @@ builder.Services.AddScoped<OrderService, OrderService>();
 builder.Services.AddScoped<IPaymentRepo, PaymentRepo>();
 builder.Services.AddScoped<PaymentService, PaymentService>();
 
+builder.Services.AddScoped<CloudMessaging>();
+
+// Sockets
+builder.Services.AddScoped<BranchOrdersSocketHandler>();
+builder.Services.AddScoped<CustomerOrdersSocketHandler>();
+
+// Managers
+builder.Services.AddScoped<OrderManager>();
+
 builder.Services.AddControllers();
 
 // JWT Authentication
@@ -107,6 +118,10 @@ builder.Services.AddScoped<IAuthorizationHandler, ManageRestaurantHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, AdminHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, BranchManagerHandler>();
 
+FirebaseAdmin.FirebaseApp.Create(new FirebaseAdmin.AppOptions()
+{
+    Credential = GoogleCredential.FromFile("Keys/firebase-adminsdk.json"),
+});
 
 var app = builder.Build();
 app.UseCors("AllowSpecificOrigin");
@@ -118,6 +133,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseWebSockets();
 app.UseAuthentication();
 app.UseAuthorization();
 

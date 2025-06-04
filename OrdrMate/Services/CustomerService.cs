@@ -46,6 +46,7 @@ public class CustomerService
         {
             Token = token,
             Email = user.Username,
+            UserId = user.Id
         };
     }
 }

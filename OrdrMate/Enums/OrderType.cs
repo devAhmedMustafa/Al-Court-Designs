@@ -1,4 +1,4 @@
-namespace OrderMate.Enums;
+namespace OrdrMate.Enums;
 
 public enum OrderType
 {

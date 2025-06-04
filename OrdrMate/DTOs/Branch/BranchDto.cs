@@ -8,5 +8,6 @@ public class BranchDto
     public string BranchAddress { get; set; }
     public string BranchPhoneNumber { get; set; }
     public string RestaurantId { get; set; }
+    public string RestaurantName { get; set; }
     public string BranchManagerId { get; set; }
 }

@@ -38,4 +38,22 @@ public class PaymentService
 
         return paymentDto;
     }
+
+    public async Task<bool> UpdatePaymentStatus(string orderId, PaymentStatus status)
+    {
+        var payment = await _paymentRepo.GetPaymentByOrderId(orderId);
+        if (payment == null)
+        {
+            throw new KeyNotFoundException($"Payment with id {orderId} not found.");
+        }
+
+        payment.Status = status;
+        if (status == PaymentStatus.Completed)
+        {
+            payment.PaidAt = DateTime.UtcNow;
+        }
+
+        var updatedPayment = await _paymentRepo.UpdatePayment(payment);
+        return updatedPayment != null;
+    }
 }

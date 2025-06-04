@@ -5,18 +5,22 @@ using OrdrMate.DTOs.User;
 using OrdrMate.Models;
 using OrdrMate.Repositories;
 using OrdrMate.Utils;
+using OrdrMate.Events;
+using OrdrMate.Managers;
 
 public class BranchService
 {
     private readonly IBranchRepo _branchRepo;
     private readonly ManagerService _managerService;
+    private readonly OrderManager _orderManager;
     private readonly RestaurantService _restaurantService;
 
-    public BranchService(IBranchRepo branchRepo, ManagerService managerService, RestaurantService restaurantService)
+    public BranchService(IBranchRepo branchRepo, ManagerService managerService, RestaurantService restaurantService, OrderManager orderManager)
     {
         _branchRepo = branchRepo;
         _managerService = managerService;
         _restaurantService = restaurantService;
+        _orderManager = orderManager;
     }
 
     public async Task<BranchDto> GetBranchById(string id)
@@ -46,6 +50,7 @@ public class BranchService
             Longitude = b.Longitude,
             BranchAddress = b.Address,
             RestaurantId = b.RestaurantId,
+            RestaurantName = b.Restaurant?.Name ?? "Unknown",
         });
     }
 
@@ -98,6 +103,9 @@ public class BranchService
         };
 
         var createdBranch = await _branchRepo.CreateBranch(branch);
+
+        BranchEvents.OnBranchCreated(createdBranch);
+
         return new BranchApprovalDto
         {
             BranchId = createdBranch.Id,
@@ -107,6 +115,32 @@ public class BranchService
             BranchManagerId = createdBranch.BranchManagerId,
             BranchManagerUsername = username,
             BranchManagerPassword = password,
+        };
+    }
+
+    public async Task<BranchInfoDto> GetBranchInfo(string branchId)
+    {
+        var branch = await _branchRepo.GetBranchById(branchId);
+        if (branch == null)
+        {
+            throw new KeyNotFoundException($"Branch with id {branchId} not found.");
+        }
+
+        var ordersInQueue = await _branchRepo.GetOrdersInQueue(branchId);
+        var freeTables = await _branchRepo.GetFreeTables(branchId);
+        var waitingTimes = await _orderManager.GetEstimatedTimes(branchId);
+
+        return new BranchInfoDto
+        {
+            BranchId = branch.Id,
+            BranchAddress = branch.Address,
+            BranchPhoneNumber = branch.Phone,
+            RestaurantName = branch.Restaurant?.Name ?? "Unknown",
+            FreeTables = freeTables,
+            OrdersInQueue = ordersInQueue,
+            MinWaitingTime = waitingTimes.MinWaitingTime,
+            MaxWaitingTime = waitingTimes.MaxWaitingTime,
+            AverageWaitingTime = waitingTimes.AverageWaitingTime
         };
     }
 

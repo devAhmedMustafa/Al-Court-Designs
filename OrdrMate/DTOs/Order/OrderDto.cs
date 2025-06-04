@@ -6,7 +6,7 @@ public class OrderDto
     public required string RestaurantName { get; set; }
     public required string Customer { get; set; }
     public required string OrderType { get; set; }
-    public required OrderItemDto[] OrderItems { get; set; }
+    public OrderItemDto[]? OrderItems { get; set; }
     public required string PaymentMethod { get; set; }
     public required DateTime OrderDate { get; set; }
     public required string OrderStatus { get; set; }

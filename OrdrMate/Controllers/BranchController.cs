@@ -147,4 +147,37 @@ public class BranchController : ControllerBase
         }
     }
 
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAllBranches()
+    {
+        try
+        {
+            var branches = await _branchService.GetAllBranches();
+            return Ok(branches);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while retrieving branches: {ex.Message}");
+        }
+    }
+
+    [HttpGet("info/{branchId}")]
+    public async Task<ActionResult<BranchInfoDto>> GetBranchInfo(string branchId)
+    {
+        try
+        {
+            var branchInfo = await _branchService.GetBranchInfo(branchId);
+            if (branchInfo == null)
+            {
+                return NotFound($"Branch with ID {branchId} not found.");
+            }
+
+            return Ok(branchInfo);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound($"Branch with ID {branchId} not found: {ex.Message}");
+        }
+    }
+
 }

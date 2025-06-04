@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OrdrMate.Data;
@@ -11,9 +12,11 @@ using OrdrMate.Data;
 namespace OrdrMate.Migrations
 {
     [DbContext(typeof(OrdrMateDbContext))]
-    partial class OrdrMateDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250530232321_AddIsAvailableForTable")]
+    partial class AddIsAvailableForTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,23 +116,6 @@ namespace OrdrMate.Migrations
                         .IsUnique();
 
                     b.ToTable("Category");
-                });
-
-            modelBuilder.Entity("OrdrMate.Models.FirebaseToken", b =>
-                {
-                    b.Property<string>("Token")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Token");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("FirebaseToken");
                 });
 
             modelBuilder.Entity("OrdrMate.Models.Indoor", b =>
@@ -273,9 +259,6 @@ namespace OrdrMate.Migrations
 
                     b.Property<TimeOnly>("OrderTime")
                         .HasColumnType("time without time zone");
-
-                    b.Property<int>("OrderType")
-                        .HasColumnType("integer");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
@@ -488,17 +471,6 @@ namespace OrdrMate.Migrations
                         .IsRequired();
 
                     b.Navigation("Restaurant");
-                });
-
-            modelBuilder.Entity("OrdrMate.Models.FirebaseToken", b =>
-                {
-                    b.HasOne("OrdrMate.Models.User", "User")
-                        .WithOne()
-                        .HasForeignKey("OrdrMate.Models.FirebaseToken", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("OrdrMate.Models.Indoor", b =>

@@ -1,19 +1,22 @@
 classDiagram
-    class Order {
+    class OrderItem {
         + int orderId
+        + decimal preparationTime
+        + String itemName
+        + int quantity
         + DateTime orderDate
     }
 
     class OrderQueue {
-        + Queue~Order~ orders
-        + void addOrder(Order order)
+        + Queue~OrderItem~ orders
+        + void addOrder(OrderItem order)
         + Order getNextOrder()
         + int getOrderCount()
     }
 
     class RestaurantQueueManager {
         - Map~String, OrderQueue[]~ restaurantQueues
-        + void addOrder(String kitchen, Order order)
+        + void addOrder(String kitchen, OrderItem order)
         + Order getNextOrder(String kitchen)
         + int getOrderCount(String kitchen)
         + void removeOrder(String kitchen, int orderId)
@@ -25,6 +28,6 @@ classDiagram
         + Map~String, RestaurantQueueManager~ restaurantManagers
     }
 
-    OrderQueue "1" -- "0..*" Order : contains
+    OrderQueue "1" -- "0..*" OrderItem : contains
     RestaurantQueueManager "1" -- "0..*" OrderQueue : manages
     OrdersManager "1" -- "0..*" RestaurantQueueManager : oversees

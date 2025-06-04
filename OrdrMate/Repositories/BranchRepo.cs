@@ -15,12 +15,33 @@ public class BranchRepo : IBranchRepo
 
     public async Task<Branch> GetBranchById(string id)
     {
-        return await _context.Branch.FindAsync(id) ?? throw new KeyNotFoundException($"Branch with id {id} not found.");
+        return await _context.Branch.Include(b => b.Restaurant)
+        .FirstOrDefaultAsync(b => b.Id == id)
+        ?? throw new KeyNotFoundException($"Branch with id {id} not found.");
+    }
+
+    public async Task<Branch> GetDetailedBranchById(string id)
+    {
+        return await _context.Branch
+        .Include(b => b.KitchenPowers).ThenInclude(kp => kp.Kitchen)
+        .Include(b => b.Orders.OrderBy(o => o.OrderDate)).ThenInclude(o => o.OrderItems).ThenInclude(oi => oi.Item).ThenInclude(i => i.Kitchen)
+        .Include(b => b.Tables)
+        .AsSplitQuery()
+        .AsNoTracking()
+        .FirstOrDefaultAsync(b => b.Id == id)
+        ?? throw new KeyNotFoundException($"Branch with id {id} not found.");
     }
 
     public async Task<IEnumerable<Branch>> GetAllBranches()
     {
-        return await _context.Branch.ToListAsync();
+        return await _context.Branch
+        .Include(b => b.Restaurant)
+        .Include(b => b.Tables)
+        .Include(b => b.Orders.OrderBy(o => o.OrderDate)).ThenInclude(o => o.OrderItems).ThenInclude(oi => oi.Item).ThenInclude(i => i.Kitchen)
+        .Include(b => b.KitchenPowers).ThenInclude(kp => kp.Kitchen)
+        .AsSplitQuery()
+        .AsNoTracking()
+        .ToListAsync();
     }
 
     public async Task<IEnumerable<Branch>> GetRestaurantBranches(string restaurantId)
@@ -41,6 +62,7 @@ public class BranchRepo : IBranchRepo
     {
         await _context.Branch.AddAsync(branch);
         await _context.SaveChangesAsync();
+
         return branch;
     }
 
@@ -54,6 +76,7 @@ public class BranchRepo : IBranchRepo
 
         _context.Branch.Remove(branch);
         await _context.SaveChangesAsync();
+
         return true;
     }
 
@@ -88,5 +111,18 @@ public class BranchRepo : IBranchRepo
         return restaurant?.ManagerId == managerId;
     }
 
+    public async Task<int> GetFreeTables(string branchId)
+    {
+        var tables = await _context.Table.CountAsync(t => t.BranchId == branchId);
+        return tables;
+    }
+
+    public async Task<int> GetOrdersInQueue(string branchId)
+    {
+        var orders = await _context.Order
+            .Where(o => o.BranchId == branchId && o.Status == Enums.OrderStatus.Queued)
+            .CountAsync();
+        return orders;
+    }
 
 }

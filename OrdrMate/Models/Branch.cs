@@ -9,9 +9,11 @@ public class Branch
     public string Phone { get; set; }
     public string RestaurantId { get; set; }
     public string BranchManagerId { get; set; }
-    public User BranchManager { get; set; }
-    public Restaurant Restaurant { get; set; }
-    public ICollection<Table> Tables { get; set; }
-    public ICollection<Order> Orders { get; set; }
+    public User? BranchManager { get; set; }
+    public Restaurant? Restaurant { get; set; }
+    public ICollection<Table>? Tables { get; set; }
+    public ICollection<Order>? Orders { get; set; }
+    public ICollection<KitchenPower>? KitchenPowers { get; set; }
+
     
 }
