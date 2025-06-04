@@ -17,11 +17,7 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restore dependencies
-        run: dotnet restore ./OrdrMate/OrdrMate.csproj
 
-      - name: Publish application
-        run: dotnet publish ./OrdrMate/OrdrMate.csproj -c Release -o ./OrdrMate/publish 
 
       - name: Prepare SSH key
       
