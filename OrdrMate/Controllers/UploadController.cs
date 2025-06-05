@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,7 +21,7 @@ public class UploadController(IWebHostEnvironment env, IConfiguration config, S3
 
         if (_env.IsDevelopment())
         {
-            var uploadUrl = $"http://localhost:5126/api/upload/upload?filename={fileUrl}";
+            var uploadUrl = $"http://localhost:5126/api/Upload/upload/{fileUrl}";
 
             return Ok(new
             {
@@ -34,7 +33,7 @@ public class UploadController(IWebHostEnvironment env, IConfiguration config, S3
         {
             var bucketName = _config["AWS:BucketName"];
             if (string.IsNullOrEmpty(bucketName)) return StatusCode(500, "Bucket name is not configured.");
-            var presignedUrl = _s3Service.GeneratePresignedUrl(bucketName, fileUrl, 15, Amazon.S3.HttpVerb.PUT);
+            var presignedUrl = _s3Service.GeneratePresignedUrl(bucketName, fileUrl, 15, Amazon.S3.HttpVerb.PUT, fileType);
             return Ok(new
             {
                 uploadUrl = presignedUrl,
@@ -69,26 +68,24 @@ public class UploadController(IWebHostEnvironment env, IConfiguration config, S3
         return Forbid("Not allowed in production");
     }
 
-    [HttpPut("upload")]
-    public async Task<IActionResult> UploadFile([FromQuery] string filename)
+    [HttpPut("upload/{fileName}")]
+    public async Task<IActionResult> UploadFile(string fileName)
     {
-        var form = await Request.ReadFormAsync();
-        var file = form.Files["file"];
-
-        if (file == null || file.Length == 0)
-        {
-            return BadRequest("No file uploaded.");
-        }
+        // Print content type
+        Console.WriteLine($"Uploading file {Request.ContentLength} bytes");
+        Console.WriteLine($"Content-Type: {Request.ContentType}");
+        if (string.IsNullOrEmpty(fileName)) return BadRequest("File name is required.");
 
         var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
 
         if (!Directory.Exists(uploadsPath))
             Directory.CreateDirectory(uploadsPath);
 
-        var fullPath = Path.Combine(uploadsPath, filename);
+        var fullPath = Path.Combine(uploadsPath, fileName);
+
 
         using var stream = new FileStream(fullPath, FileMode.Create);
-        await file.CopyToAsync(stream);
+        await Request.Body.CopyToAsync(stream);
 
         return Ok(new { filePath = fullPath });
     }

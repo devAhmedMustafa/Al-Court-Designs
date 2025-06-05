@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using System.Text;
-using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -14,15 +13,11 @@ using OrdrMate.Managers;
 using OrdrMate.Sockets;
 using Google.Apis.Auth.OAuth2;
 
-Env.Load();
-
 var builder = WebApplication.CreateBuilder(args);
+var env = builder.Environment;
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-
-var connectionString = Environment.GetEnvironmentVariable("DB_URL");
 
 builder.Services.AddDbContext<OrdrMateDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -33,9 +28,18 @@ builder.Services.AddCors(options =>
     // Allow all origins, methods, and headers
     options.AddPolicy("AllowSpecificOrigin", builder =>
     {
-        builder.AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader();
+        if (env.IsDevelopment())
+        {
+            builder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        }
+        else if (env.IsProduction())
+        {
+            builder.WithOrigins("https://ordrmate-manager.vercel.app", "https://ordrmate-manager.vercel.app")
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        }
     });
 });
 
