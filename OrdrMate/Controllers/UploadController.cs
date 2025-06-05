@@ -34,7 +34,7 @@ public class UploadController(IWebHostEnvironment env, IConfiguration config, S3
         {
             var bucketName = _config["AWS:BucketName"];
             if (string.IsNullOrEmpty(bucketName)) return StatusCode(500, "Bucket name is not configured.");
-            var presignedUrl = _s3Service.GeneratePresignedUrl(bucketName, fileUrl, 15, Amazon.S3.HttpVerb.PUT, fileType);
+            var presignedUrl = _s3Service.GeneratePresignedUrl(bucketName, fileUrl, 15, Amazon.S3.HttpVerb.PUT);
             return Ok(new
             {
                 uploadUrl = presignedUrl,

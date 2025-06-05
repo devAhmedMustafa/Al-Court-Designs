@@ -16,7 +16,7 @@ public class S3Service
         _s3Client = new AmazonS3Client(credentials, awsRegion);
     }
 
-    public string GeneratePresignedUrl(string bucketName, string key, int durationInMinutes, HttpVerb httpVerb, string? contentType = null)
+    public string GeneratePresignedUrl(string bucketName, string key, int durationInMinutes, HttpVerb httpVerb)
     {
         var request = new GetPreSignedUrlRequest
         {
@@ -24,7 +24,6 @@ public class S3Service
             Key = key,
             Verb = httpVerb,
             Expires = DateTime.UtcNow.AddMinutes(durationInMinutes),
-            ContentType = contentType
         }; 
 
         return _s3Client.GetPreSignedURL(request);
