@@ -75,9 +75,6 @@ builder.Services.AddScoped<PaymentService, PaymentService>();
 
 builder.Services.AddScoped<CloudMessaging>();
 
-// AWS S3 Configuration
-builder.Services.AddScoped<S3Service>();
-
 // Sockets
 builder.Services.AddScoped<BranchOrdersSocketHandler>();
 builder.Services.AddScoped<CustomerOrdersSocketHandler>();
@@ -86,6 +83,10 @@ builder.Services.AddScoped<CustomerOrdersSocketHandler>();
 builder.Services.AddScoped<OrderManager>();
 
 builder.Services.AddControllers();
+
+// Third-party services
+builder.Services.AddHttpClient<PaymobService>();
+builder.Services.AddScoped<S3Service>();
 
 // JWT Authentication
 

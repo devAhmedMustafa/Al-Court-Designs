@@ -36,7 +36,7 @@ public class OrderController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "Customer")]
-    public async Task<ActionResult> PlaceOrder([FromBody] PlaceOrderDto placeOrderDto)
+    public async Task<ActionResult<OrderIntentDto>> PlaceOrder([FromBody] PlaceOrderDto placeOrderDto)
     {
         try
         {
@@ -48,14 +48,14 @@ public class OrderController : ControllerBase
             placeOrderDto.CustomerId = userId;
 
 
-            var order = await _orderService.PlaceOrder(placeOrderDto);
-            if (order == null)
+            var orderIntent = await _orderService.CreateOrderIntent(placeOrderDto);
+            if (orderIntent == null)
             {
                 Console.WriteLine("Order placement failed. Order is null.");
                 return BadRequest("Failed to place order. Please check your order details and try again.");
             }
 
-            return CreatedAtAction(nameof(PlaceOrder), new { orderId = order.OrderId }, order);
+            return CreatedAtAction(nameof(PlaceOrder), new { id = orderIntent.OrderIntentId}, orderIntent);
 
         }
         catch (Exception ex)

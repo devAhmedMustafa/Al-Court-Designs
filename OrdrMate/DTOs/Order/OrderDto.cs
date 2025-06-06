@@ -10,6 +10,7 @@ public class OrderDto
     public required string PaymentMethod { get; set; }
     public required DateTime OrderDate { get; set; }
     public required string OrderStatus { get; set; }
+    public string? PaymentRedirectUrl { get; set; }
     public required decimal TotalAmount { get; set; }
     public required string BranchId { get; set; }
     public bool IsPaid { get; set; } = false;

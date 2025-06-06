@@ -14,6 +14,35 @@ public class OrderRepo : IOrderRepo
         _db = context;
     }
 
+    public async Task<OrderIntent> CreateOrderIntent(OrderIntent orderIntent)
+    {
+        var savedOrderIntent = _db.OrderIntent.Add(orderIntent);
+        await _db.SaveChangesAsync();
+        return savedOrderIntent.Entity;
+    }
+
+    public async Task<OrderIntent?> GetOrderIntentById(string orderIntentId)
+    {
+        return await _db.OrderIntent
+            .Include(o => o.Customer)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(oi => oi.Id == orderIntentId);
+    }
+
+    public async Task<OrderIntent?> UpdateOrderIntentStatus(string orderIntentId, PaymentStatus status)
+    {
+        var orderIntent = await _db.OrderIntent
+            .FirstOrDefaultAsync(oi => oi.Id == orderIntentId);
+        if (orderIntent == null)
+        {
+            throw new KeyNotFoundException($"OrderIntent with id {orderIntentId} not found.");
+        }
+        orderIntent.Status = status;
+        _db.OrderIntent.Update(orderIntent);
+        await _db.SaveChangesAsync();
+        return orderIntent;
+    }
+
     public async Task<Order> CreateOrder(Order order)
     {
         var savedOrder = _db.Order.Add(order);

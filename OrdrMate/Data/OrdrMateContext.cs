@@ -21,6 +21,7 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
     public DbSet<Takeaway> Takeaway => Set<Takeaway>();
     public DbSet<OrderItem> OrderItem => Set<OrderItem>();
     public DbSet<Payment> Payment => Set<Payment>();
+    public DbSet<OrderIntent> OrderIntent => Set<OrderIntent>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -139,6 +140,21 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
             .HasOne(kp => kp.Branch)
             .WithMany(b => b.KitchenPowers)
             .HasForeignKey(kp => kp.BranchId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // OrderIntent
+
+        modelBuilder.Entity<OrderIntent>().HasKey(oi => oi.Id);
+        modelBuilder.Entity<OrderIntent>().HasIndex(oi => oi.OrderId).IsUnique();
+        modelBuilder.Entity<OrderIntent>()
+            .HasOne(oi => oi.Customer)
+            .WithMany()
+            .HasForeignKey(oi => oi.CustomerId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<OrderIntent>()
+            .HasOne(oi => oi.Branch)
+            .WithMany()
+            .HasForeignKey(oi => oi.BranchId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Order

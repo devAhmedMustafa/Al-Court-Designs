@@ -11,76 +11,152 @@ public class OrderService
 {
     private readonly PaymentService _paymentService;
     private readonly IOrderRepo _orderRepo;
+    private readonly PaymobService _paymobService;
 
-    public OrderService(PaymentService paymentService, IOrderRepo orderRepo)
+    public OrderService(PaymentService paymentService, IOrderRepo orderRepo, PaymobService paymobService)
     {
         _paymentService = paymentService;
         _orderRepo = orderRepo;
+        _paymobService = paymobService;
     }
 
-    public async Task<OrderDto> PlaceOrder(PlaceOrderDto placeOrderDto)
+    public async Task<OrderIntentDto> CreateOrderIntent(PlaceOrderDto orderIntent)
     {
+
+        var totalAmount = orderIntent.Items.Sum(oi => oi.Price * oi.Quantity);
+
+        var intent = new OrderIntent
+        {
+            CustomerId = orderIntent.CustomerId,
+            BranchId = orderIntent.BranchId,
+            Status = PaymentStatus.INITIATED,
+            Amount = totalAmount,
+            PaymentMethod = orderIntent.PaymentMethod,
+            OrderType = orderIntent.OrderType,
+            PaymentProvider = orderIntent.PaymentMethod == "Cash" ? "Cash" : "Paymob",
+            OrderItems = [.. orderIntent.Items.Select(oi => new OrderItemDto
+            {
+                ItemId = oi.ItemId,
+                Quantity = oi.Quantity,
+                Price = oi.Price,
+            })],
+        };
+
+        var redirectUrl = string.Empty;
+
+        switch (intent.PaymentProvider.ToLower())
+        {
+            case "cash":
+                var order = await ConfirmOrder(intent);
+                intent.OrderId = order.Id;
+                break;
+
+            case "paymob":
+                var intentResponse = await CreatePaymentSession(intent)
+                    ?? throw new InvalidOperationException("Failed to create payment session with Paymob.");
+
+                if (string.IsNullOrEmpty(intentResponse.RedirectUrl)) throw new InvalidOperationException("Redirect URL is empty from Paymob response.");
+
+                redirectUrl = intentResponse.RedirectUrl;
+                intent.Id = intentResponse.OrderId;
+                break;
+            default:
+                throw new NotSupportedException($"Payment provider {intent.PaymentProvider} is not supported.");
+        }
+
+
+        var savedIntent = await _orderRepo.CreateOrderIntent(intent);
+
+        return new OrderIntentDto
+        {
+            OrderIntentId = savedIntent.Id,
+            RedirectUrl = redirectUrl,
+        };
+    }
+
+    public async Task<IntentResponse> CreatePaymentSession(OrderIntent orderIntent)
+    {
+        return await _paymobService.CreateOrderIntent(orderIntent.Amount, orderIntent.PaymentMethod);
+    }
+
+    public async Task<OrderDto> ProceedTransaction(string orderIntentId, string transactionId)
+    {
+        var orderIntent = await _orderRepo.GetOrderIntentById(orderIntentId) ?? throw new KeyNotFoundException($"Order intent with id {orderIntentId} not found.");
+        if (orderIntent.Status != PaymentStatus.INITIATED) throw new InvalidOperationException($"Order intent with id {orderIntentId} is not in a valid state for processing.");
+
+        var order = await ConfirmOrder(orderIntent, true) ?? throw new InvalidOperationException($"Failed to confirm order for order intent with id {orderIntentId}.");
+        orderIntent.OrderId = order.Id;
+
+        var payment = await ProcessPayment(orderIntent, transactionId) ?? throw new InvalidOperationException($"Failed to process payment for order intent with id {orderIntentId}.");
+        orderIntent.Status = PaymentStatus.Completed;
+
+        return new OrderDto
+        {
+            OrderId = order.Id,
+            BranchId = order.BranchId,
+            RestaurantName = order.Branch?.Restaurant?.Name ?? "Unknown Restaurant",
+            Customer = order.Customer?.Username ?? "Unknown Customer",
+            OrderType = orderIntent.OrderType.ToString(),
+            PaymentMethod = orderIntent.PaymentMethod,
+            OrderDate = order.OrderDate,
+            OrderStatus = order.Status.ToString(),
+            TotalAmount = order.TotalAmount,
+        };
+    }
+
+    private async Task<Order> ConfirmOrder(OrderIntent orderIntent, bool isPaid = false)
+    {
+        var existingOrder = await _orderRepo.GetOrderById(orderIntent.OrderId!);
+        if (existingOrder != null)
+        {
+            Console.WriteLine($"Order with ID {orderIntent.OrderId} already exists. Skipping order creation.");
+            return existingOrder;
+        }
+        
         var order = new Order
         {
-            BranchId = placeOrderDto.BranchId,
-            CustomerId = placeOrderDto.CustomerId,
-            TotalAmount = CalculateOrderTotal.GetTotalPrice(placeOrderDto.Items),
+            BranchId = orderIntent.BranchId,
+            CustomerId = orderIntent.CustomerId,
+            OrderType = orderIntent.OrderType,
+            TotalAmount = orderIntent.Amount,
+            OrderDate = DateTime.UtcNow,
+            Status = OrderStatus.Queued,
+            IsPaid = isPaid,
         };
 
         order = await _orderRepo.CreateOrder(order);
 
-        var dto = new OrderDto
-        {
-            OrderId = order.Id,
-            RestaurantName = order.Branch?.Restaurant?.Name ?? "Unknown Restaurant",
-            Customer = order.Customer?.Username ?? "Unknown Customer",
-            OrderType = placeOrderDto.OrderType.ToString(),
-            PaymentMethod = placeOrderDto.PaymentMethod,
-            OrderDate = DateTime.UtcNow,
-            OrderStatus = order.Status.ToString(),
-            TotalAmount = order.TotalAmount,
-            BranchId = order.BranchId,
-        };
-
         List<OrderItem> orderItems = [];
 
-        foreach (var orderitem in placeOrderDto.Items)
+        if (orderIntent.OrderItems != null && orderIntent.OrderItems.Any())
         {
-            var orderItem = new OrderItem
+            foreach (var item in orderIntent.OrderItems)
             {
-                OrderId = order.Id,
-                ItemId = orderitem.ItemId,
-                Quantity = orderitem.Quantity,
-                Price = orderitem.Price,
-            };
+                var orderItem = new OrderItem
+                {
+                    ItemId = item.ItemId,
+                    OrderId = order.Id,
+                    Quantity = item.Quantity,
+                    Price = item.Price,
+                };
 
-            var savedOrderItem = await _orderRepo.CreateOrderItem(orderItem);
-
-            if (savedOrderItem.Item == null)
-            {
-                Console.WriteLine($"Order item with ID {savedOrderItem.ItemId} not found. Skipping this item.");
-                continue;
+                orderItem = await _orderRepo.CreateOrderItem(orderItem);
+                orderItems.Add(orderItem);
             }
-
-            orderItems = [.. orderItems, savedOrderItem];
         }
 
         OrderEvents.OnOrderPlaced(order.BranchId, orderItems);
 
-        switch (placeOrderDto.OrderType)
+        switch (orderIntent.OrderType)
         {
             case OrderType.Takeaway:
-                dto.OrderNumber = await PlaceTakeawayOrder(order);
-                dto.IsPaid = false;
-                order.OrderType = OrderType.Takeaway;
+                await PlaceTakeawayOrder(order);
                 break;
             default:
-                throw new NotImplementedException($"Order type {placeOrderDto.OrderType} is not implemented yet.");
+                throw new NotImplementedException($"Order type {orderIntent.OrderType} is not implemented yet.");
         }
 
-        await ProcessPayment(order, placeOrderDto);
-
-        return dto;
+        return order;
     }
 
     private async Task<int> PlaceTakeawayOrder(Order order)
@@ -98,14 +174,9 @@ public class OrderService
         return orderNum;
     }
 
-    private async Task<PaymentDto> ProcessPayment(Order order, PlaceOrderDto placeOrderDto)
+    private async Task<PaymentDto> ProcessPayment(OrderIntent orderIntent, string transactionId)
     {
-
-        return placeOrderDto.PaymentMethod.ToLower() switch
-        {
-            "cash" => await _paymentService.AddCashPayment(order.Id, order.TotalAmount),
-            _ => throw new NotImplementedException($"Payment method {placeOrderDto.PaymentMethod} is not implemented yet."),
-        };
+        return await _paymentService.AddPayment(orderIntent, transactionId);
     }
     public async Task<IEnumerable<OrderDto>> GetCustomerOrders(string customerId)
     {
@@ -247,7 +318,6 @@ public class OrderService
         if (order.IsPaid) return true;
 
         order.IsPaid = true;
-        await _paymentService.UpdatePaymentStatus(orderId, PaymentStatus.Completed);
         order = await _orderRepo.SetOrderPaidStatus(orderId, true);
 
         if (order == null) throw new KeyNotFoundException($"Order with id {orderId} not found after updating payment status.");
@@ -305,4 +375,10 @@ public class OrderService
         });
     }
 
+}
+
+public class IntentResponse
+{
+    public required string OrderId { get; set; }
+    public required string RedirectUrl { get; set; }
 }
