@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OrdrMate.Data;
@@ -11,9 +12,11 @@ using OrdrMate.Data;
 namespace OrdrMate.Migrations
 {
     [DbContext(typeof(OrdrMateDbContext))]
-    partial class OrdrMateDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250606190953_DropTableReservationTable")]
+    partial class DropTableReservationTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -328,9 +331,6 @@ namespace OrdrMate.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("Seats")
-                        .HasColumnType("integer");
-
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -459,48 +459,6 @@ namespace OrdrMate.Migrations
                         .IsUnique();
 
                     b.ToTable("Table");
-                });
-
-            modelBuilder.Entity("OrdrMate.Models.TableReservation", b =>
-                {
-                    b.Property<string>("ReservationId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("BranchId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("CustomerId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("OrderId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ReservationStatus")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("ReservationTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("TableNumber")
-                        .HasColumnType("integer");
-
-                    b.HasKey("ReservationId");
-
-                    b.HasIndex("BranchId");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("OrderId")
-                        .IsUnique();
-
-                    b.HasIndex("TableNumber", "BranchId", "ReservationTime")
-                        .IsUnique();
-
-                    b.ToTable("TableReservation");
                 });
 
             modelBuilder.Entity("OrdrMate.Models.Takeaway", b =>
@@ -755,33 +713,6 @@ namespace OrdrMate.Migrations
                         .IsRequired();
 
                     b.Navigation("Branch");
-                });
-
-            modelBuilder.Entity("OrdrMate.Models.TableReservation", b =>
-                {
-                    b.HasOne("OrdrMate.Models.Branch", "Branch")
-                        .WithMany()
-                        .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("OrdrMate.Models.User", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("OrdrMate.Models.Order", "Order")
-                        .WithOne()
-                        .HasForeignKey("OrdrMate.Models.TableReservation", "OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Branch");
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("OrdrMate.Models.Takeaway", b =>

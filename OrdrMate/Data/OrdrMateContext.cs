@@ -14,6 +14,7 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
     public DbSet<Branch> Branch => Set<Branch>();
     public DbSet<BranchRequest> BranchRequest => Set<BranchRequest>();
     public DbSet<Table> Table => Set<Table>();
+    public DbSet<TableReservation> TableReservation => Set<TableReservation>();
     public DbSet<Kitchen> Kitchen => Set<Kitchen>();
     public DbSet<KitchenPower> KitchenPower => Set<KitchenPower>();
     public DbSet<Order> Order => Set<Order>();
@@ -118,6 +119,26 @@ public class OrdrMateDbContext(DbContextOptions<OrdrMateDbContext> options)
             .HasOne(t => t.Branch)
             .WithMany(b => b.Tables)
             .HasForeignKey(t => t.BranchId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // TableReservation
+
+        modelBuilder.Entity<TableReservation>().HasKey(tr => tr.ReservationId);
+        modelBuilder.Entity<TableReservation>().HasIndex(tr => new { tr.TableNumber, tr.BranchId, tr.ReservationTime }).IsUnique();
+        modelBuilder.Entity<TableReservation>()
+            .HasOne(tr => tr.Branch)
+            .WithMany()
+            .HasForeignKey(tr => tr.BranchId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<TableReservation>()
+            .HasOne(tr => tr.Customer)
+            .WithMany()
+            .HasForeignKey(tr => tr.CustomerId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<TableReservation>()
+            .HasOne(tr => tr.Order)
+            .WithOne()
+            .HasForeignKey<TableReservation>(tr => tr.OrderId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Kitchen

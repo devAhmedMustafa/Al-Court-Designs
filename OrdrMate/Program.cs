@@ -81,12 +81,14 @@ builder.Services.AddScoped<CustomerOrdersSocketHandler>();
 
 // Managers
 builder.Services.AddScoped<OrderManager>();
-
-builder.Services.AddControllers();
+builder.Services.AddScoped<TableManager>();
 
 // Third-party services
 builder.Services.AddHttpClient<PaymobService>();
 builder.Services.AddScoped<S3Service>();
+
+
+builder.Services.AddControllers();
 
 // JWT Authentication
 

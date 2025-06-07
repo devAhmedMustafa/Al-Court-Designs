@@ -23,8 +23,8 @@ public class BranchRepo : IBranchRepo
     public async Task<Branch> GetDetailedBranchById(string id)
     {
         return await _context.Branch
-        .Include(b => b.KitchenPowers).ThenInclude(kp => kp.Kitchen)
-        .Include(b => b.Orders.OrderBy(o => o.OrderDate)).ThenInclude(o => o.OrderItems).ThenInclude(oi => oi.Item).ThenInclude(i => i.Kitchen)
+        .Include(b => b.KitchenPowers)!.ThenInclude(kp => kp.Kitchen)
+        .Include(b => b.Orders!.OrderBy(o => o.OrderDate)).ThenInclude(o => o.OrderItems)!.ThenInclude(oi => oi.Item).ThenInclude(i => i.Kitchen)
         .Include(b => b.Tables)
         .AsSplitQuery()
         .AsNoTracking()
@@ -37,8 +37,8 @@ public class BranchRepo : IBranchRepo
         return await _context.Branch
         .Include(b => b.Restaurant)
         .Include(b => b.Tables)
-        .Include(b => b.Orders.OrderBy(o => o.OrderDate)).ThenInclude(o => o.OrderItems).ThenInclude(oi => oi.Item).ThenInclude(i => i.Kitchen)
-        .Include(b => b.KitchenPowers).ThenInclude(kp => kp.Kitchen)
+        .Include(b => b.Orders!.OrderBy(o => o.OrderDate)).ThenInclude(o => o.OrderItems)!.ThenInclude(oi => oi.Item).ThenInclude(i => i.Kitchen)
+        .Include(b => b.KitchenPowers)!.ThenInclude(kp => kp.Kitchen)
         .AsSplitQuery()
         .AsNoTracking()
         .ToListAsync();

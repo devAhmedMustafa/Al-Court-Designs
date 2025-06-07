@@ -4,6 +4,7 @@ public class OrderDto
 {
     public required string OrderId { get; set; }
     public required string RestaurantName { get; set; }
+    public required string CustomerId { get; set; }
     public required string Customer { get; set; }
     public required string OrderType { get; set; }
     public OrderItemDto[]? OrderItems { get; set; }
